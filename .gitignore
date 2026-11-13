@@ -1,0 +1,57 @@
+# Root .gitignore for WAVY
+
+# Environments & Virtual Envs
+.env
+.env.local
+.env.*.local
+backend/venv/
+backend/.venv/
+venv/
+ENV/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# Node & React Native / Expo
+node_modules/
+.expo/
+dist/
+web-build/
+*.tsbuildinfo
+.npm
+
+# Mobile platform builds
+*.orig.*
+android/app/build/
+android/.gradle
+android/build/
+ios/build/
+ios/Pods/
+
+# Native binaries & keys
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# IDE & OS
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Database & Uploads
+*.sqlite3
+*.db
+backend/uploads/
