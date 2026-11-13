@@ -40,11 +40,11 @@
   - `EmptyState` (zero-state illustrations and call-to-actions).
   - `Input` (focus states, error display, prefix/suffix icons).
 - [x] **5-Section Tab Navigation Shell:**
-  - Applied authentic Google Material 3 color system (Google Blue `#1A73E8`, Google Red `#EA4335`, Google Yellow `#FBBC04`, Google Green `#34A853`).
-  - Google signature search bar with the iconic 4-color quartet dots and profile avatar circle.
-  - Horizontal Material filter chips (`All`, `Printing`, `Transportation`, `Tutoring`, `Laptop Repair`, `Shopping`, `Deliveries`).
-  - Google Blue Floating Action Button (FAB) `+ Ask Help` for rapid one-tap request creation.
-  - Clean Material 3 cards with Google Roboto/Product Sans spacing and typography.
+  - Redesigned flagship Home Screen: Focused, circular "Ask for Help" button with expanding concentric animated radar pulse rings in Google Blue.
+  - Locality indicator chip ("Gachibowli, Hyderabad") and quick access to nearby requests radar.
+  - Discover tab with search and 1km/5km/10km/20km distance filters.
+  - Streamlined "Ask Help" creation form with one-tap budget presets.
+  - User Profile & Activity tracking tabs.
 - [x] **Authentication & Onboarding Shells:**
   - [mobile/app/(auth)/welcome.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/welcome.tsx): 3-slide value proposition carousel.
   - [mobile/app/(auth)/login.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/login.tsx): Google one-tap & email/password authentication preview.
