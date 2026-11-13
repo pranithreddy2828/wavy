@@ -1,6 +1,11 @@
 /**
- * WAVY Design System - Google Material 3 Aesthetic
- * Ultra-clean, calm, accessible, and distraction-free
+ * WAVY Design System - Authentic Google Brand & Material 3 Colors
+ * The iconic Google 4-color system:
+ * - Google Blue: #1A73E8 / #8AB4F8
+ * - Google Red: #EA4335 / #F28B82
+ * - Google Yellow: #FBBC04 / #FDD663
+ * - Google Green: #34A853 / #81C995
+ * - Google Surfaces: #F8F9FA & #202124
  */
 
 export interface ColorTheme {
@@ -14,7 +19,7 @@ export interface ColorTheme {
   border: string;
   borderSubtle: string;
 
-  // Accents
+  // Google Brand Accents
   primary: string;
   primaryHover: string;
   primaryMuted: string;
@@ -24,6 +29,12 @@ export interface ColorTheme {
   secondary: string;
   secondaryMuted: string;
   secondaryContainer: string;
+
+  // Google 4-Color Quartet
+  googleBlue: string;
+  googleRed: string;
+  googleYellow: string;
+  googleGreen: string;
 
   // Status Tones
   success: string;
@@ -36,7 +47,7 @@ export interface ColorTheme {
   urgent: string;
   urgentMuted: string;
 
-  // Typography
+  // Typography (Google Roboto/Product Sans standards)
   text: string;
   textSecondary: string;
   textTertiary: string;
@@ -50,26 +61,83 @@ export interface ColorTheme {
   cardHighlight: string;
 }
 
+export const lightTheme: ColorTheme = {
+  isDark: false,
+  background: '#F8F9FA',           // Google standard light canvas
+  surface: '#FFFFFF',              // Google clean card white
+  surfaceVariant: '#F1F3F4',       // Google pill chip & search bar grey
+  surfaceRaised: '#FFFFFF',
+  surfaceSubtle: '#E8EAED',
+  surfaceContainer: '#F1F3F4',
+  border: '#DADCE0',               // Google signature border
+  borderSubtle: '#F1F3F4',
+
+  // Google Blue is flagship primary
+  primary: '#1A73E8',
+  primaryHover: '#1557B0',
+  primaryMuted: '#E8F0FE',
+  primaryContainer: '#E8F0FE',
+  onPrimaryContainer: '#1967D2',
+
+  secondary: '#5F6368',
+  secondaryMuted: '#F1F3F4',
+  secondaryContainer: '#F1F3F4',
+
+  // The 4 Iconic Google Colors
+  googleBlue: '#1A73E8',
+  googleRed: '#EA4335',
+  googleYellow: '#FBBC04',
+  googleGreen: '#34A853',
+
+  success: '#34A853',
+  successMuted: '#E6F4EA',
+  warning: '#F9AB00',
+  warningMuted: '#FEF7E0',
+  danger: '#EA4335',
+  dangerMuted: '#FCE8E6',
+  error: '#EA4335',
+  urgent: '#EA4335',
+  urgentMuted: '#FCE8E6',
+
+  text: '#202124',                 // Google high-contrast dark text
+  textSecondary: '#5F6368',        // Google standard grey text
+  textTertiary: '#80868B',
+  textInverse: '#FFFFFF',
+
+  searchBarBg: '#FFFFFF',
+  tabBarBackground: '#FFFFFF',
+  tabBarBorder: '#DADCE0',
+  activePillBg: '#E8F0FE',
+  cardHighlight: 'rgba(0, 0, 0, 0.02)',
+};
+
 export const darkTheme: ColorTheme = {
   isDark: true,
-  background: '#121316',
-  surface: '#1E1F24',
-  surfaceVariant: '#282A30',
-  surfaceRaised: '#23252B',
-  surfaceSubtle: '#2D3037',
-  surfaceContainer: '#23252B',
-  border: '#33363F',
-  borderSubtle: '#26282E',
+  background: '#202124',           // Google dark theme root
+  surface: '#303134',              // Google search bar & card surface
+  surfaceVariant: '#3C4043',       // Google chip surface
+  surfaceRaised: '#303134',
+  surfaceSubtle: '#3C4043',
+  surfaceContainer: '#35363A',
+  border: '#3C4043',
+  borderSubtle: '#2D2E30',
 
-  primary: '#00D1B2',
-  primaryHover: '#00BFA5',
-  primaryMuted: 'rgba(0, 209, 178, 0.14)',
-  primaryContainer: 'rgba(0, 209, 178, 0.14)',
-  onPrimaryContainer: '#00D1B2',
+  // Google Blue in Dark Mode
+  primary: '#8AB4F8',
+  primaryHover: '#ADC6FA',
+  primaryMuted: 'rgba(138, 180, 248, 0.16)',
+  primaryContainer: 'rgba(138, 180, 248, 0.16)',
+  onPrimaryContainer: '#8AB4F8',
 
-  secondary: '#8AB4F8',
-  secondaryMuted: 'rgba(138, 180, 248, 0.14)',
-  secondaryContainer: 'rgba(138, 180, 248, 0.14)',
+  secondary: '#9AA0A6',
+  secondaryMuted: 'rgba(154, 160, 166, 0.14)',
+  secondaryContainer: '#3C4043',
+
+  // The 4 Iconic Google Colors (Dark Mode calibrated)
+  googleBlue: '#8AB4F8',
+  googleRed: '#F28B82',
+  googleYellow: '#FDD663',
+  googleGreen: '#81C995',
 
   success: '#81C995',
   successMuted: 'rgba(129, 201, 149, 0.16)',
@@ -78,62 +146,20 @@ export const darkTheme: ColorTheme = {
   danger: '#F28B82',
   dangerMuted: 'rgba(242, 139, 130, 0.16)',
   error: '#F28B82',
-  urgent: '#FF5252',
-  urgentMuted: 'rgba(255, 82, 82, 0.16)',
+  urgent: '#F28B82',
+  urgentMuted: 'rgba(242, 139, 130, 0.16)',
 
-  text: '#E3E3E3',
-  textSecondary: '#C4C7C5',
-  textTertiary: '#8E918F',
-  textInverse: '#121316',
+  text: '#E8EAED',                 // Google dark theme text
+  textSecondary: '#BDC1C6',        // Google dark secondary text
+  textTertiary: '#9AA0A6',
+  textInverse: '#202124',
 
-  searchBarBg: '#1E1F24',
-  tabBarBackground: '#18191D',
-  tabBarBorder: '#282A30',
-  activePillBg: 'rgba(0, 209, 178, 0.16)',
+  searchBarBg: '#303134',
+  tabBarBackground: '#202124',
+  tabBarBorder: '#3C4043',
+  activePillBg: 'rgba(138, 180, 248, 0.16)',
   cardHighlight: 'rgba(255, 255, 255, 0.04)',
 };
 
-export const lightTheme: ColorTheme = {
-  isDark: false,
-  background: '#F8F9FA',
-  surface: '#FFFFFF',
-  surfaceVariant: '#F1F3F4',
-  surfaceRaised: '#F1F3F4',
-  surfaceSubtle: '#E8EAED',
-  surfaceContainer: '#EDEDED',
-  border: '#E0E2E5',
-  borderSubtle: '#F1F3F4',
-
-  primary: '#00875A',
-  primaryHover: '#00704A',
-  primaryMuted: '#E6F4EA',
-  primaryContainer: '#E6F4EA',
-  onPrimaryContainer: '#137333',
-
-  secondary: '#1A73E8',
-  secondaryMuted: '#E8F0FE',
-  secondaryContainer: '#E8F0FE',
-
-  success: '#188038',
-  successMuted: 'rgba(24, 128, 56, 0.14)',
-  warning: '#F29900',
-  warningMuted: 'rgba(242, 153, 0, 0.14)',
-  danger: '#D93025',
-  dangerMuted: 'rgba(217, 48, 37, 0.14)',
-  error: '#D93025',
-  urgent: '#D93025',
-  urgentMuted: 'rgba(217, 48, 37, 0.14)',
-
-  text: '#1F1F1F',
-  textSecondary: '#444746',
-  textTertiary: '#747775',
-  textInverse: '#FFFFFF',
-
-  searchBarBg: '#FFFFFF',
-  tabBarBackground: '#FFFFFF',
-  tabBarBorder: '#E0E2E5',
-  activePillBg: '#E6F4EA',
-  cardHighlight: 'rgba(0, 0, 0, 0.02)',
-};
-
-export const colors = darkTheme;
+// Default is lightTheme for the authentic, iconic bright Google look
+export const colors = lightTheme;

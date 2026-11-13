@@ -20,10 +20,10 @@ import {
 } from '../../src/services/requestsApi';
 import {
   Search,
-  MapPin,
   Plus,
   HelpCircle,
-  User,
+  MapPin,
+  SlidersHorizontal,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
@@ -65,32 +65,41 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* 1. Google-Style Top Search Pill */}
+      {/* 1. Google Signature Search Bar */}
       <View style={styles.topContainer}>
         <TouchableOpacity
-          activeOpacity={0.85}
+          activeOpacity={0.9}
           onPress={() => router.push('/(tabs)/discover' as any)}
           style={[
             styles.googleSearchPill,
             {
-              backgroundColor: colors.searchBarBg,
+              backgroundColor: colors.surface,
               borderColor: colors.border,
             },
           ]}
         >
-          <Search size={18} color={colors.textTertiary} />
+          {/* Iconic Google 4-Color Quartet Indicator */}
+          <View style={styles.googleDots}>
+            <View style={[styles.gDot, { backgroundColor: colors.googleBlue }]} />
+            <View style={[styles.gDot, { backgroundColor: colors.googleRed }]} />
+            <View style={[styles.gDot, { backgroundColor: colors.googleYellow }]} />
+            <View style={[styles.gDot, { backgroundColor: colors.googleGreen }]} />
+          </View>
+
           <Text style={[typography.body, { color: colors.textSecondary, marginLeft: 10, flex: 1 }]}>
-            Search requests in Gachibowli...
+            Search requests in Hyderabad...
           </Text>
+
+          {/* Profile Circle Avatar */}
           <TouchableOpacity
             onPress={() => router.push('/(tabs)/profile' as any)}
-            style={[styles.profileAvatar, { backgroundColor: colors.primaryContainer }]}
+            style={[styles.profileAvatar, { backgroundColor: colors.primary }]}
           >
-            <User size={16} color={colors.primary} />
+            <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 13 }}>R</Text>
           </TouchableOpacity>
         </TouchableOpacity>
 
-        {/* 2. Material Filter Chips */}
+        {/* 2. Google Material Filter Chips */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -150,7 +159,7 @@ export default function HomeScreen() {
         </ScrollView>
       </View>
 
-      {/* 3. Clean Feed */}
+      {/* 3. Clean Google-Style Feed */}
       <ScrollView
         contentContainerStyle={[styles.feedContent, { paddingBottom: 110 }]}
         refreshControl={
@@ -163,15 +172,21 @@ export default function HomeScreen() {
         }
       >
         <View style={styles.feedHeader}>
-          <Text style={[typography.caption, { color: colors.textTertiary, fontWeight: '700', textTransform: 'uppercase' }]}>
-            Nearby in Hyderabad ({requests.length})
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <MapPin size={13} color={colors.primary} />
+            <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: 4, fontWeight: '600' }]}>
+              Gachibowli, Hyderabad
+            </Text>
+          </View>
+          <Text style={[typography.caption, { color: colors.textTertiary }]}>
+            {requests.length} active needs
           </Text>
         </View>
 
         {loading ? (
           <View style={{ gap: 12 }}>
-            <Skeleton height={140} borderRadius={20} />
-            <Skeleton height={140} borderRadius={20} />
+            <Skeleton height={140} borderRadius={16} />
+            <Skeleton height={140} borderRadius={16} />
           </View>
         ) : requests.length > 0 ? (
           requests.map((item) => (
@@ -184,22 +199,28 @@ export default function HomeScreen() {
         ) : (
           <EmptyState
             icon={<HelpCircle size={36} color={colors.primary} />}
-            title="No requests right now"
-            description="Tap the '+ Ask Help' button below to post what you need in seconds."
+            title="No requests nearby"
+            description="Tap the '+ Ask Help' button to post what you need in seconds."
             actionTitle="Ask for Help"
             onAction={() => router.push('/(tabs)/create' as any)}
           />
         )}
       </ScrollView>
 
-      {/* 4. Google Material 3 Floating Action Button (FAB) */}
+      {/* 4. Google Material 3 Floating Action Button (FAB) in Google Blue */}
       <TouchableOpacity
-        activeOpacity={0.85}
+        activeOpacity={0.88}
         onPress={() => router.push('/(tabs)/create' as any)}
-        style={[styles.fab, { backgroundColor: colors.primary }]}
+        style={[
+          styles.fab,
+          {
+            backgroundColor: colors.primary,
+            shadowColor: colors.primary,
+          },
+        ]}
       >
-        <Plus size={20} color={colors.textInverse} strokeWidth={2.8} />
-        <Text style={[typography.bodyBold, { color: colors.textInverse, marginLeft: 6 }]}>
+        <Plus size={20} color="#FFFFFF" strokeWidth={2.8} />
+        <Text style={[typography.bodyBold, { color: '#FFFFFF', marginLeft: 6 }]}>
           Ask Help
         </Text>
       </TouchableOpacity>
@@ -214,20 +235,29 @@ const styles = StyleSheet.create({
   topContainer: {
     paddingHorizontal: 16,
     paddingTop: 8,
-    paddingBottom: 6,
+    paddingBottom: 4,
   },
   googleSearchPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 50,
-    borderRadius: 25,
+    height: 52,
+    borderRadius: 26,
     borderWidth: 1,
     paddingHorizontal: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  googleDots: {
+    flexDirection: 'row',
+    gap: 3,
+  },
+  gDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
   },
   profileAvatar: {
     width: 32,
@@ -238,7 +268,7 @@ const styles = StyleSheet.create({
   },
   chipsScroll: {
     gap: 8,
-    paddingVertical: 12,
+    paddingVertical: 10,
   },
   filterChip: {
     paddingHorizontal: 14,
@@ -251,6 +281,9 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   feedHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     marginBottom: 10,
   },
   fab: {
@@ -262,9 +295,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 14,
     borderRadius: 28,
-    shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.35,
     shadowRadius: 8,
     elevation: 6,
   },

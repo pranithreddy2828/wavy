@@ -23,11 +23,11 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const systemColorScheme = useColorScheme();
-  const [mode, setMode] = useState<ThemeMode>('dark'); // Flagship default: dark
+  const [mode, setMode] = useState<ThemeMode>('light'); // Google flagship bright look by default
 
   const isDark = useMemo(() => {
     if (mode === 'system') {
-      return systemColorScheme === 'light' ? false : true;
+      return systemColorScheme === 'dark';
     }
     return mode === 'dark';
   }, [mode, systemColorScheme]);

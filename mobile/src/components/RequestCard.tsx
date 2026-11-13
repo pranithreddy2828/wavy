@@ -14,18 +14,18 @@ export const RequestCard: React.FC<RequestCardProps> = ({ request, onPress }) =>
 
   return (
     <TouchableOpacity
-      activeOpacity={0.85}
+      activeOpacity={0.88}
       onPress={onPress}
       style={[
         styles.card,
         {
           backgroundColor: colors.surface,
           borderColor: colors.border,
-          borderRadius: 20,
+          borderRadius: 16,
         },
       ]}
     >
-      {/* Top Meta: Category & Distance */}
+      {/* Top Meta: Category, Distance & Urgent tag */}
       <View style={styles.topRow}>
         <View style={[styles.categoryPill, { backgroundColor: colors.surfaceVariant }]}>
           <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '600' }]}>
@@ -41,12 +41,16 @@ export const RequestCard: React.FC<RequestCardProps> = ({ request, onPress }) =>
         </View>
 
         {request.urgency === 'urgent' && (
-          <View style={[styles.urgentDot, { backgroundColor: colors.error }]} />
+          <View style={[styles.urgentChip, { backgroundColor: colors.dangerMuted }]}>
+            <Text style={[typography.tiny, { color: colors.googleRed, fontWeight: '800' }]}>
+              URGENT
+            </Text>
+          </View>
         )}
       </View>
 
       {/* Title */}
-      <Text style={[typography.h4, { color: colors.text, marginTop: spacing.sm, fontWeight: '700' }]} numberOfLines={2}>
+      <Text style={[typography.h4, { color: colors.text, marginTop: spacing.xs, fontWeight: '700' }]} numberOfLines={2}>
         {request.title}
       </Text>
 
@@ -58,7 +62,7 @@ export const RequestCard: React.FC<RequestCardProps> = ({ request, onPress }) =>
         {request.description}
       </Text>
 
-      {/* Bottom Bar: Price & Action */}
+      {/* Bottom Bar: Price, Requester rating & Google Action */}
       <View style={[styles.bottomBar, { borderTopColor: colors.borderSubtle }]}>
         <View>
           <Text style={[typography.tiny, { color: colors.textTertiary }]}>
@@ -69,11 +73,20 @@ export const RequestCard: React.FC<RequestCardProps> = ({ request, onPress }) =>
           </Text>
         </View>
 
-        <View style={[styles.helpButton, { backgroundColor: colors.primaryContainer }]}>
-          <Text style={[typography.caption, { color: colors.primary, fontWeight: '700', marginRight: 4 }]}>
-            Offer Help
-          </Text>
-          <ArrowRight size={13} color={colors.primary} />
+        <View style={styles.rightGroup}>
+          <View style={styles.ratingInfo}>
+            <Star size={12} color={colors.googleYellow} fill={colors.googleYellow} />
+            <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: 3, fontWeight: '600' }]}>
+              {request.requester.rating_avg.toFixed(1)}
+            </Text>
+          </View>
+
+          <View style={[styles.helpButton, { backgroundColor: colors.primaryContainer }]}>
+            <Text style={[typography.caption, { color: colors.primary, fontWeight: '700', marginRight: 4 }]}>
+              Offer Help
+            </Text>
+            <ArrowRight size={13} color={colors.primary} />
+          </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -84,7 +97,12 @@ const styles = StyleSheet.create({
   card: {
     padding: 16,
     borderWidth: 1,
-    marginBottom: 12,
+    marginBottom: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
   },
   topRow: {
     flexDirection: 'row',
@@ -100,25 +118,34 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  urgentDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
+  urgentChip: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
     marginLeft: 'auto',
   },
   bottomBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 14,
+    marginTop: 12,
     paddingTop: 10,
     borderTopWidth: 1,
+  },
+  rightGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  ratingInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   helpButton: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 7,
     borderRadius: 18,
   },
 });
