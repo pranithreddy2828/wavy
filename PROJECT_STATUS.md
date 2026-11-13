@@ -45,6 +45,7 @@
   - Discover tab with search and 1km/5km/10km/20km distance filters.
   - Streamlined "Ask Help" creation form with one-tap budget presets.
   - User Profile & Activity tracking tabs.
+  - Login / Auth stack removed as per user request to allow frictionless direct access to the entire application.
 - [x] **Authentication & Onboarding Shells:**
   - [mobile/app/(auth)/welcome.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/welcome.tsx): 3-slide value proposition carousel.
   - [mobile/app/(auth)/login.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/login.tsx): Google one-tap & email/password authentication preview.
