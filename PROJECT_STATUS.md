@@ -40,13 +40,11 @@
   - `EmptyState` (zero-state illustrations and call-to-actions).
   - `Input` (focus states, error display, prefix/suffix icons).
 - [x] **5-Section Tab Navigation Shell:**
-  - Direct root landing into [mobile/app/(tabs)/index.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/index.tsx) with zero developer friction.
-  - Custom bottom tab bar with prominent raised center action for `Create Request`.
-  - **1. Streamlined Home Feed:** Two big primary actions ("Ask for Help" & "Browse & Earn"), category filter chips, and high-readability request cards with clear price tags and single-tap "Help" button.
-  - **2. Discover Radar:** Search bar + 1km / 5km / 10km / 20km quick radius chips + active request list.
-  - **3. Simple Request Creator:** 3 quick steps: Category chip, "What do you need?", and budget presets (₹100, ₹250, ₹500, ₹1000) with 2-option urgency toggle (⚡ Urgent / 🕒 Flexible).
-  - **4. Activity Dashboard:** Segregated tabs for Ongoing, My Requests, My Offers, and Completed.
-  - **5. User Profile & Trust:** Reputation metrics, trust badges, skills, and instant Dark/Light theme toggle.
+  - Applied Google Material 3 design language (calm, familiar, accessible, zero-clutter).
+  - Top Google-style rounded search pill with user profile avatar and instant search access.
+  - Horizontal Material filter chips (`All`, `Printing`, `Rides`, `Tutoring`, `Repairs`, `Delivery`, `Shopping`).
+  - Google Material 3 Extended Floating Action Button (FAB) `+ Ask Help` for effortless one-tap posting.
+  - Material 3 cards with clean typography, distance badges, and clear price tags.
 - [x] **Authentication & Onboarding Shells:**
   - [mobile/app/(auth)/welcome.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/welcome.tsx): 3-slide value proposition carousel.
   - [mobile/app/(auth)/login.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/login.tsx): Google one-tap & email/password authentication preview.
