@@ -28,7 +28,7 @@ function RootNavigationShell() {
           },
         }}
       >
-        {/* Main Tab Navigation */}
+        {/* Main Tab Navigation is the primary root */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
         {/* Authentication Stack */}
@@ -40,14 +40,6 @@ function RootNavigationShell() {
           options={{
             headerShown: false,
             animation: 'slide_from_right',
-          }}
-        />
-
-        {/* Developer Diagnostics Root */}
-        <Stack.Screen
-          name="index"
-          options={{
-            headerShown: false,
           }}
         />
       </Stack>

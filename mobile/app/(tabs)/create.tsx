@@ -89,7 +89,7 @@ export default function CreateRequestScreen() {
             fullWidth
             onPress={() => {
               handleReset();
-              router.push('/(tabs)' as any);
+              router.push('/' as any);
             }}
             style={{ marginTop: 24, marginBottom: 12 }}
           />
