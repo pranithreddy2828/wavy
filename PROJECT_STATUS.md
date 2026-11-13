@@ -40,11 +40,11 @@
   - `EmptyState` (zero-state illustrations and call-to-actions).
   - `Input` (focus states, error display, prefix/suffix icons).
 - [x] **5-Section Tab Navigation Shell:**
-  - Applied Google Material 3 design language (calm, familiar, accessible, zero-clutter).
-  - Top Google-style rounded search pill with user profile avatar and instant search access.
-  - Horizontal Material filter chips (`All`, `Printing`, `Rides`, `Tutoring`, `Repairs`, `Delivery`, `Shopping`).
-  - Google Material 3 Extended Floating Action Button (FAB) `+ Ask Help` for effortless one-tap posting.
-  - Material 3 cards with clean typography, distance badges, and clear price tags.
+  - Applied authentic Google Material 3 color system (Google Blue `#1A73E8`, Google Red `#EA4335`, Google Yellow `#FBBC04`, Google Green `#34A853`).
+  - Google signature search bar with the iconic 4-color quartet dots and profile avatar circle.
+  - Horizontal Material filter chips (`All`, `Printing`, `Transportation`, `Tutoring`, `Laptop Repair`, `Shopping`, `Deliveries`).
+  - Google Blue Floating Action Button (FAB) `+ Ask Help` for rapid one-tap request creation.
+  - Clean Material 3 cards with Google Roboto/Product Sans spacing and typography.
 - [x] **Authentication & Onboarding Shells:**
   - [mobile/app/(auth)/welcome.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/welcome.tsx): 3-slide value proposition carousel.
   - [mobile/app/(auth)/login.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/login.tsx): Google one-tap & email/password authentication preview.
