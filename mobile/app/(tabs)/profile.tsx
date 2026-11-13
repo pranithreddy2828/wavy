@@ -5,12 +5,13 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { Card } from '../../src/components/ui/Card';
 import { Badge } from '../../src/components/ui/Badge';
-import { Button } from '../../src/components/ui/Button';
+import { useAuthStore } from '../../src/store/authStore';
 import {
   User,
   Star,
@@ -24,10 +25,53 @@ import {
   ChevronRight,
   LogOut,
   MapPin,
+  Trash2,
 } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 
 export default function ProfileScreen() {
   const { colors, spacing, typography, radius, isDark, toggleTheme } = useTheme();
+  const router = useRouter();
+  const { user, isAuthenticated, logout, deleteAccount } = useAuthStore();
+
+  const handleSignOut = async () => {
+    Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Sign Out',
+        style: 'destructive',
+        onPress: async () => {
+          await logout();
+          router.replace('/(auth)/welcome' as any);
+        },
+      },
+    ]);
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account (DPDP Right to Erasure)',
+      'This will permanently delete your profile, requests, offers, and chat history. This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete Permanently',
+          style: 'destructive',
+          onPress: async () => {
+            const success = await deleteAccount();
+            if (success) {
+              Alert.alert('Account Deleted', 'All your data has been erased.');
+              router.replace('/(auth)/welcome' as any);
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const displayName = user?.profile?.display_name || 'Guest User';
+  const username = user?.profile?.username ? `@${user.profile.username}` : '@neighbour';
+  const locality = user?.profile?.general_locality || 'Gachibowli, Hyderabad';
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
@@ -40,48 +84,50 @@ export default function ProfileScreen() {
           onPress={toggleTheme}
           style={[
             styles.themeToggle,
-            { backgroundColor: colors.surfaceRaised, borderColor: colors.border },
+            { backgroundColor: colors.surface, borderColor: colors.border },
           ]}
           activeOpacity={0.7}
         >
           {isDark ? (
-            <Sun size={18} color="#F59E0B" />
+            <Sun size={18} color={colors.googleYellow} />
           ) : (
-            <Moon size={18} color={colors.primary} />
+            <Moon size={18} color={colors.googleBlue} />
           )}
         </TouchableOpacity>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 100 }]}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 110 }]}>
         {/* User Identity Card */}
         <Card style={styles.profileCard}>
           <View style={styles.avatarRow}>
-            <View style={[styles.avatar, { backgroundColor: colors.primaryMuted, borderColor: colors.primary }]}>
-              <User size={38} color={colors.primary} />
+            <View style={[styles.avatar, { backgroundColor: colors.primaryContainer }]}>
+              <Text style={{ color: colors.googleBlue, fontWeight: '800', fontSize: 24 }}>
+                {displayName.charAt(0).toUpperCase()}
+              </Text>
             </View>
             <View style={{ flex: 1, marginLeft: spacing.md }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={[typography.h3, { color: colors.text }]}>Rahul Verma</Text>
-                <ShieldCheck size={18} color={colors.primary} style={{ marginLeft: 6 }} />
+                <Text style={[typography.h3, { color: colors.text }]}>{displayName}</Text>
+                <ShieldCheck size={18} color={colors.googleBlue} style={{ marginLeft: 6 }} />
               </View>
-              <Text style={[typography.body, { color: colors.textSecondary }]}>@rahul_hyd</Text>
+              <Text style={[typography.body, { color: colors.textSecondary }]}>{username}</Text>
               <View style={styles.localityRow}>
                 <MapPin size={12} color={colors.textTertiary} />
                 <Text style={[typography.caption, { color: colors.textTertiary, marginLeft: 2 }]}>
-                  Gachibowli, Hyderabad
+                  {locality}
                 </Text>
               </View>
             </View>
           </View>
 
-          {/* Bio */}
-          <Text style={[typography.body, { color: colors.text, marginTop: spacing.md }]}>
-            Software engineer & tech enthusiast. Can help with Python tutoring, laptop diagnostics, and urgent Xerox/printing in Gachibowli area.
-          </Text>
-
           {/* Verification Badges */}
           <View style={[styles.badgesRow, { marginTop: spacing.md }]}>
-            <Badge label="EMAIL VERIFIED" variant="success" size="sm" icon={<CheckCircle2 size={12} color={colors.success} />} />
+            <Badge
+              label="EMAIL VERIFIED"
+              variant="success"
+              size="sm"
+              icon={<CheckCircle2 size={12} color={colors.success} />}
+            />
             <Badge label="COMMUNITY HELPER" variant="primary" size="sm" />
             <Badge label="ID OPTIONAL" variant="neutral" size="sm" />
           </View>
@@ -91,62 +137,42 @@ export default function ProfileScreen() {
         <View style={styles.metricsRow}>
           <View style={[styles.metricBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Star size={16} color="#F59E0B" fill="#F59E0B" />
-              <Text style={[typography.h3, { color: colors.text, marginLeft: 4 }]}>4.9</Text>
+              <Star size={16} color={colors.googleYellow} fill={colors.googleYellow} />
+              <Text style={[typography.h3, { color: colors.text, marginLeft: 4 }]}>5.0</Text>
             </View>
             <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 2 }]}>
-              14 Reviews
+              Reputation
             </Text>
           </View>
 
           <View style={[styles.metricBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[typography.h3, { color: colors.primary }]}>8</Text>
+            <Text style={[typography.h3, { color: colors.googleBlue }]}>
+              {user?.profile?.completed_activities_count || 0}
+            </Text>
             <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 2 }]}>
-              Activities Completed
+              Activities
             </Text>
           </View>
 
           <View style={[styles.metricBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <Text style={[typography.h3, { color: colors.success }]}>100%</Text>
             <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 2 }]}>
-              Completion Rate
+              Completion
             </Text>
           </View>
         </View>
 
-        {/* Skills & Services Offered */}
-        <Card style={{ marginTop: spacing.md }}>
-          <Text style={[typography.h4, { color: colors.text, marginBottom: spacing.xs }]}>
-            Skills & Services Offered
-          </Text>
-          <View style={styles.skillsWrapper}>
-            {['Python Debugging', 'Laser Printing & Xerox', 'Laptop Upgrades', 'Carpool Gachibowli'].map((skill) => (
-              <View
-                key={skill}
-                style={[
-                  styles.skillChip,
-                  { backgroundColor: colors.surfaceRaised, borderColor: colors.border },
-                ]}
-              >
-                <Text style={[typography.caption, { color: colors.text, fontWeight: '600' }]}>
-                  {skill}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </Card>
-
-        {/* Safety, Privacy & Settings Menu */}
+        {/* Privacy & DPDP Notice */}
         <Card style={{ marginTop: spacing.md, padding: 0 }}>
           <Text style={[typography.caption, { color: colors.textTertiary, fontWeight: '700', padding: 16, paddingBottom: 8 }]}>
-            PRIVACY & SAFETY SETTINGS (DPDP ACT)
+            PRIVACY & DPDP SETTINGS
           </Text>
 
           {[
-            { label: 'Privacy & Obfuscation Preferences', icon: <Lock size={18} color={colors.textSecondary} /> },
+            { label: 'Privacy & Approximate Location (500m)', icon: <Lock size={18} color={colors.textSecondary} /> },
             { label: 'Trusted Safety Contacts', icon: <Shield size={18} color={colors.textSecondary} /> },
             { label: 'Terms of Service & DPDP Notice', icon: <FileText size={18} color={colors.textSecondary} /> },
-          ].map((item, idx) => (
+          ].map((item) => (
             <TouchableOpacity
               key={item.label}
               style={[
@@ -166,11 +192,24 @@ export default function ProfileScreen() {
           ))}
         </Card>
 
-        {/* Logout / Switch Account */}
-        <TouchableOpacity style={styles.logoutButton} activeOpacity={0.7}>
-          <LogOut size={16} color={colors.danger} style={{ marginRight: 6 }} />
-          <Text style={[typography.bodyBold, { color: colors.danger }]}>Sign Out of WAVY</Text>
-        </TouchableOpacity>
+        {/* Account Actions */}
+        <View style={styles.actionSection}>
+          <TouchableOpacity onPress={handleSignOut} style={styles.signoutRow} activeOpacity={0.7}>
+            <LogOut size={16} color={colors.textSecondary} style={{ marginRight: 6 }} />
+            <Text style={[typography.bodyBold, { color: colors.textSecondary }]}>
+              {isAuthenticated ? 'Sign Out of WAVY' : 'Switch or Sign In'}
+            </Text>
+          </TouchableOpacity>
+
+          {isAuthenticated && (
+            <TouchableOpacity onPress={handleDeleteAccount} style={styles.deleteRow} activeOpacity={0.7}>
+              <Trash2 size={15} color={colors.error} style={{ marginRight: 6 }} />
+              <Text style={[typography.caption, { color: colors.error, fontWeight: '700' }]}>
+                Delete My Account & Personal Data (DPDP)
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -184,7 +223,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderBottomWidth: 1,
   },
   themeToggle: {
@@ -206,10 +246,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    borderWidth: 2,
+    width: 58,
+    height: 58,
+    borderRadius: 29,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -236,30 +275,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  skillsWrapper: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 8,
-  },
-  skillChip: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-    borderWidth: 1,
-  },
   menuItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: 16,
   },
-  logoutButton: {
+  actionSection: {
+    marginTop: 24,
+    alignItems: 'center',
+    gap: 12,
+  },
+  signoutRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 24,
-    paddingVertical: 12,
+    paddingVertical: 10,
+  },
+  deleteRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
   },
 });
-

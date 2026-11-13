@@ -11,34 +11,48 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { Input } from '../../src/components/ui/Input';
 import { Button } from '../../src/components/ui/Button';
-import { Badge } from '../../src/components/ui/Badge';
-import { User, Mail, Lock, ArrowLeft, Shield, MapPin } from 'lucide-react-native';
+import { useAuthStore } from '../../src/store/authStore';
+import { User, Mail, Lock, ArrowLeft, MapPin } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
 export default function RegisterScreen() {
   const { colors, spacing, typography, radius } = useTheme();
   const router = useRouter();
+  const { register, isLoading, error, clearError } = useAuthStore();
 
   const [displayName, setDisplayName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const handleRegister = () => {
-    if (!displayName || !username || !email || !password) {
+  const handleRegister = async () => {
+    if (!displayName.trim() || !username.trim() || !email.trim() || !password.trim()) {
       Alert.alert('Required Fields', 'Please fill out all registration fields.');
       return;
     }
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    if (password.length < 8) {
+      Alert.alert('Weak Password', 'Password must be at least 8 characters long.');
+      return;
+    }
+
+    clearError();
+    const success = await register({
+      email,
+      password,
+      display_name: displayName,
+      username,
+      city: 'Hyderabad',
+    });
+
+    if (success) {
       Alert.alert(
-        'Account Registered',
-        'Verification link sent! Navigating to the community hub.',
-        [{ text: 'Proceed', onPress: () => router.replace('/(tabs)' as any) }]
+        'Welcome to WAVY!',
+        'Your account has been created. Connect with your neighbours in Hyderabad.',
+        [{ text: 'Explore Community', onPress: () => router.replace('/(tabs)/index' as any) }]
       );
-    }, 800);
+    } else {
+      Alert.alert('Registration Failed', error || 'Could not complete registration.');
+    }
   };
 
   return (
@@ -47,7 +61,7 @@ export default function RegisterScreen() {
       <View style={styles.topBar}>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={[styles.backBtn, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }]}
+          style={[styles.backBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
         >
           <ArrowLeft size={18} color={colors.text} />
         </TouchableOpacity>
@@ -102,10 +116,10 @@ export default function RegisterScreen() {
           containerStyle={{ marginBottom: spacing.lg }}
         />
 
-        <View style={[styles.cityBadge, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }]}>
-          <MapPin size={16} color={colors.primary} />
+        <View style={[styles.cityBadge, { backgroundColor: colors.surfaceVariant }]}>
+          <MapPin size={16} color={colors.googleBlue} />
           <Text style={[typography.bodyBold, { color: colors.text, marginLeft: 6 }]}>
-            Initial Launch City: Hyderabad, India
+            Launch City: Hyderabad, India
           </Text>
         </View>
 
@@ -114,7 +128,7 @@ export default function RegisterScreen() {
           variant="primary"
           size="lg"
           fullWidth
-          loading={loading}
+          loading={isLoading}
           onPress={handleRegister}
           style={{ marginTop: spacing.lg }}
         />
@@ -125,7 +139,7 @@ export default function RegisterScreen() {
             Already have an account?{' '}
           </Text>
           <TouchableOpacity onPress={() => router.push('/(auth)/login' as any)}>
-            <Text style={[typography.bodyBold, { color: colors.primary }]}>
+            <Text style={[typography.bodyBold, { color: colors.googleBlue }]}>
               Sign In
             </Text>
           </TouchableOpacity>
@@ -162,8 +176,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    borderRadius: 8,
-    borderWidth: 1,
+    borderRadius: 12,
   },
   footerRow: {
     flexDirection: 'row',
@@ -172,4 +185,3 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
 });
-

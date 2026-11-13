@@ -11,37 +11,40 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { Input } from '../../src/components/ui/Input';
 import { Button } from '../../src/components/ui/Button';
-import { Badge } from '../../src/components/ui/Badge';
+import { useAuthStore } from '../../src/store/authStore';
 import { Mail, Lock, ArrowLeft, Shield } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
 export default function LoginScreen() {
   const { colors, spacing, typography, radius } = useTheme();
   const router = useRouter();
+  const { login, isLoading, error, clearError } = useAuthStore();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    if (!email || !password) {
+  const handleLogin = async () => {
+    if (!email.trim() || !password.trim()) {
       Alert.alert('Required Fields', 'Please enter your email and password.');
       return;
     }
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      router.replace('/(tabs)' as any);
-    }, 600);
+
+    clearError();
+    const success = await login({ email, password });
+    if (success) {
+      router.replace('/(tabs)/index' as any);
+    } else {
+      Alert.alert('Login Failed', error || 'Invalid email or password.');
+    }
   };
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-      {/* Back button */}
+      {/* Top Bar */}
       <View style={styles.topBar}>
         <TouchableOpacity
           onPress={() => router.back()}
-          style={[styles.backBtn, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }]}
+          style={[styles.backBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
         >
           <ArrowLeft size={18} color={colors.text} />
         </TouchableOpacity>
@@ -54,7 +57,7 @@ export default function LoginScreen() {
           Welcome Back to WAVY
         </Text>
         <Text style={[typography.body, { color: colors.textSecondary, marginTop: spacing.xs, marginBottom: spacing.xl }]}>
-          Enter your registered email address to access your hyperlocal requests, active offers, and community chat.
+          Enter your registered email address to access your requests and community offers.
         </Text>
 
         {/* Google One-Tap Sign In */}
@@ -66,7 +69,7 @@ export default function LoginScreen() {
           onPress={() => {
             Alert.alert(
               'Google Sign-In',
-              'Google OAuth token exchange will be fully connected in Milestone 3 (Authentication).'
+              'To configure Google Sign-In on mobile, add your Google Web Client ID in the Google Cloud Console.'
             );
           }}
           style={{ marginBottom: spacing.lg }}
@@ -103,7 +106,7 @@ export default function LoginScreen() {
         />
 
         <TouchableOpacity style={{ alignSelf: 'flex-end', marginBottom: spacing.xl }}>
-          <Text style={[typography.caption, { color: colors.primary, fontWeight: '600' }]}>
+          <Text style={[typography.caption, { color: colors.googleBlue, fontWeight: '600' }]}>
             Forgot Password?
           </Text>
         </TouchableOpacity>
@@ -113,7 +116,7 @@ export default function LoginScreen() {
           variant="primary"
           size="lg"
           fullWidth
-          loading={loading}
+          loading={isLoading}
           onPress={handleLogin}
         />
 
@@ -123,17 +126,17 @@ export default function LoginScreen() {
             Don't have an account?{' '}
           </Text>
           <TouchableOpacity onPress={() => router.push('/(auth)/register' as any)}>
-            <Text style={[typography.bodyBold, { color: colors.primary }]}>
+            <Text style={[typography.bodyBold, { color: colors.googleBlue }]}>
               Create Account
             </Text>
           </TouchableOpacity>
         </View>
 
         {/* Privacy Note */}
-        <View style={[styles.privacyBox, { backgroundColor: colors.surfaceSubtle, borderColor: colors.borderSubtle }]}>
-          <Shield size={14} color={colors.primary} />
+        <View style={[styles.privacyBox, { backgroundColor: colors.surfaceVariant, borderColor: colors.borderSubtle }]}>
+          <Shield size={14} color={colors.googleBlue} />
           <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: 6, flex: 1 }]}>
-            Phone number is NOT mandatory. Your private data is protected under India DPDP Act standards.
+            Phone numbers are NOT mandatory. Your private data is strictly protected under Indian DPDP Act standards.
           </Text>
         </View>
       </ScrollView>
@@ -182,9 +185,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     borderWidth: 1,
     marginTop: 32,
   },
 });
-

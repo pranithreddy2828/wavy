@@ -1,13 +1,3 @@
-import pytest
-from app import create_app
-
-@pytest.fixture
-def client():
-    app = create_app("development")
-    app.config["TESTING"] = True
-    with app.test_client() as client:
-        yield client
-
 def test_categories_endpoint(client):
     response = client.get("/api/v1/categories")
     assert response.status_code == 200
@@ -33,4 +23,3 @@ def test_feed_category_filter(client):
     data = response.get_json()
     for req in data["requests"]:
         assert req["category_slug"] == "printing"
-

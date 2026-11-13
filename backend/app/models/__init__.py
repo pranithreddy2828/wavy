@@ -1,6 +1,4 @@
-# SQLAlchemy Declarative Base & Models Package
 from app import db
+from app.models.user import User, UserProfile, RefreshToken, UserVerification
 
-# Explicit exports for model definitions
-__all__ = ["db"]
-
+__all__ = ["db", "User", "UserProfile", "RefreshToken", "UserVerification"]
