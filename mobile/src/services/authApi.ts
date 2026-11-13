@@ -90,3 +90,4 @@ export const authApi = {
     await apiClient.delete('/auth/account');
   },
 };
+

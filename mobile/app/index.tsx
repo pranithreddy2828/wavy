@@ -6,5 +6,5 @@ import { Redirect } from 'expo-router';
  * Directs the user straight into the clean, modern 5-tab application experience.
  */
 export default function Index() {
-  return <Redirect href="/(tabs)/index" />;
+  return <Redirect href={"/(tabs)" as any} />;
 }

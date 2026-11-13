@@ -106,3 +106,4 @@ def test_dpdp_account_deletion(client):
     # User can no longer access /me
     res_me_after = client.get("/api/v1/auth/me", headers=headers)
     assert res_me_after.status_code == 403
+

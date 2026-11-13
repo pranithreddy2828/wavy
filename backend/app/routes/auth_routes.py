@@ -154,3 +154,4 @@ def delete_account():
         "success": True,
         "message": "Your account and all associated personal data have been permanently deleted."
     }), 200
+
