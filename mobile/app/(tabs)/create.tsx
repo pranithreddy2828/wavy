@@ -16,11 +16,11 @@ import { Badge } from '../../src/components/ui/Badge';
 import { fetchCategories, Category } from '../../src/services/requestsApi';
 import {
   Sparkles,
-  MapPin,
+  Zap,
   Clock,
-  IndianRupee,
-  Shield,
   CheckCircle2,
+  MapPin,
+  IndianRupee,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
@@ -32,13 +32,13 @@ export default function CreateRequestScreen() {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [urgency, setUrgency] = useState<'low' | 'medium' | 'urgent'>('medium');
-  const [fulfillment, setFulfillment] = useState<'pickup' | 'delivery' | 'on_premise' | 'remote'>('on_premise');
-  const [radiusKm, setRadiusKm] = useState<number>(5);
+  const [urgency, setUrgency] = useState<'urgent' | 'medium'>('urgent');
   const [budget, setBudget] = useState('');
   const [isNegotiable, setIsNegotiable] = useState(true);
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+
+  const budgetPresets = ['100', '250', '500', '1000'];
 
   useEffect(() => {
     fetchCategories()
@@ -51,11 +51,7 @@ export default function CreateRequestScreen() {
 
   const handleSubmit = () => {
     if (!title.trim()) {
-      Alert.alert('Required Field', 'Please enter a title for your request.');
-      return;
-    }
-    if (!description.trim()) {
-      Alert.alert('Required Field', 'Please explain what assistance or service you need.');
+      Alert.alert('Please enter a title', 'Tell your neighbours what you need help with.');
       return;
     }
 
@@ -63,7 +59,7 @@ export default function CreateRequestScreen() {
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
-    }, 800);
+    }, 600);
   };
 
   const handleReset = () => {
@@ -76,46 +72,39 @@ export default function CreateRequestScreen() {
   if (submitted) {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
-        <View style={styles.successContainer}>
-          <View style={[styles.successBadge, { backgroundColor: colors.successMuted, borderColor: colors.success }]}>
-            <CheckCircle2 size={54} color={colors.success} />
+        <View style={styles.successWrapper}>
+          <View style={[styles.successCircle, { backgroundColor: colors.successMuted, borderColor: colors.success }]}>
+            <CheckCircle2 size={48} color={colors.success} />
           </View>
           <Text style={[typography.h2, { color: colors.text, textAlign: 'center', marginTop: spacing.md }]}>
-            Request Published!
+            Request Posted!
           </Text>
           <Text
             style={[
               typography.body,
-              { color: colors.textSecondary, textAlign: 'center', marginTop: spacing.xs, maxWidth: 320 },
+              { color: colors.textSecondary, textAlign: 'center', marginTop: 6, maxWidth: 300 },
             ]}
           >
-            Nearby community members and helpers in <Text style={{ color: colors.primary }}>Gachibowli (within {radiusKm} km)</Text> have been notified. You can review and negotiate offers as they arrive.
+            People nearby in Gachibowli have been notified. You will receive offers right here.
           </Text>
 
-          <View style={[styles.summaryCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-            <Text style={[typography.caption, { color: colors.textTertiary }]}>REQUEST SUMMARY</Text>
-            <Text style={[typography.h4, { color: colors.text, marginTop: 4 }]}>{title}</Text>
-            <View style={{ flexDirection: 'row', gap: 6, marginTop: 8 }}>
-              <Badge label={urgency.toUpperCase()} variant={urgency === 'urgent' ? 'urgent' : 'warning'} size="sm" />
-              <Badge label={`Within ${radiusKm} km`} variant="secondary" size="sm" />
-              {budget ? <Badge label={`₹${budget}`} variant="primary" size="sm" /> : null}
-            </View>
-          </View>
-
           <Button
-            title="Create Another Request"
-            variant="outline"
-            onPress={handleReset}
-            style={{ width: '100%', marginBottom: spacing.sm }}
-          />
-          <Button
-            title="Go to Home Feed"
+            title="View Active Feed"
             variant="primary"
+            size="lg"
+            fullWidth
             onPress={() => {
               handleReset();
               router.push('/(tabs)' as any);
             }}
-            style={{ width: '100%' }}
+            style={{ marginTop: 24, marginBottom: 12 }}
+          />
+          <Button
+            title="Create Another Request"
+            variant="secondary"
+            size="md"
+            fullWidth
+            onPress={handleReset}
           />
         </View>
       </SafeAreaView>
@@ -124,23 +113,20 @@ export default function CreateRequestScreen() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* Top Header */}
+      {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.borderSubtle }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Sparkles size={22} color={colors.primary} style={{ marginRight: 8 }} />
-          <Text style={[typography.h3, { color: colors.text, fontWeight: '800' }]}>
-            Create Request
-          </Text>
-        </View>
-        <Text style={[typography.caption, { color: colors.textSecondary, marginTop: 2 }]}>
-          Ask for urgent assistance, repairs, printing, transport, and more
+        <Text style={[typography.h3, { color: colors.text, fontWeight: '800' }]}>
+          Ask for Help
+        </Text>
+        <Text style={[typography.caption, { color: colors.textSecondary }]}>
+          Share what you need with nearby neighbours
         </Text>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.form, { paddingBottom: 100 }]}>
-        {/* Step 1: Category Selection */}
+      <ScrollView contentContainerStyle={[styles.form, { paddingBottom: 110 }]}>
+        {/* Step 1: Category Picker */}
         <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '700', marginBottom: 8 }]}>
-          1. CHOOSE SERVICE CATEGORY
+          SELECT CATEGORY
         </Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingBottom: 14 }}>
           {categories.map((cat) => {
@@ -150,134 +136,7 @@ export default function CreateRequestScreen() {
                 key={cat.id}
                 onPress={() => setSelectedCategory(cat.id)}
                 style={[
-                  styles.categoryCard,
-                  {
-                    backgroundColor: isSelected ? colors.primaryMuted : colors.surfaceRaised,
-                    borderColor: isSelected ? colors.primary : colors.border,
-                    borderRadius: radius.md,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    typography.caption,
-                    {
-                      color: isSelected ? colors.primary : colors.text,
-                      fontWeight: isSelected ? '700' : '500',
-                    },
-                  ]}
-                >
-                  {cat.name}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-
-        {/* Step 2: Request Title & Details */}
-        <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '700', marginBottom: 8 }]}>
-          2. REQUEST DETAILS
-        </Text>
-        <Input
-          label="Title"
-          placeholder="e.g. Need 20 Pages Color Printout by 4 PM"
-          value={title}
-          onChangeText={setTitle}
-          containerStyle={{ marginBottom: spacing.md }}
-        />
-
-        <Input
-          label="Description"
-          placeholder="Provide clear details on what you need, specifications, deadlines, and requirements..."
-          value={description}
-          onChangeText={setDescription}
-          multiline
-          numberOfLines={4}
-          style={{ minHeight: 90, textAlignVertical: 'top' }}
-          containerStyle={{ marginBottom: spacing.md }}
-        />
-
-        {/* Step 3: Priority & Fulfillment Mode */}
-        <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '700', marginBottom: 8 }]}>
-          3. URGENCY & FULFILLMENT MODE
-        </Text>
-        <View style={styles.buttonGroup}>
-          {(['low', 'medium', 'urgent'] as const).map((level) => {
-            const isSelected = urgency === level;
-            return (
-              <TouchableOpacity
-                key={level}
-                onPress={() => setUrgency(level)}
-                style={[
-                  styles.groupButton,
-                  {
-                    backgroundColor: isSelected ? (level === 'urgent' ? colors.urgentMuted : colors.primaryMuted) : colors.surfaceRaised,
-                    borderColor: isSelected ? (level === 'urgent' ? colors.urgent : colors.primary) : colors.border,
-                    borderRadius: radius.sm,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    typography.caption,
-                    {
-                      color: isSelected ? (level === 'urgent' ? colors.urgent : colors.primary) : colors.textSecondary,
-                      fontWeight: '700',
-                    },
-                  ]}
-                >
-                  {level.toUpperCase()}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        <View style={[styles.buttonGroup, { marginTop: 8 }]}>
-          {(['pickup', 'delivery', 'on_premise', 'remote'] as const).map((mode) => {
-            const isSelected = fulfillment === mode;
-            return (
-              <TouchableOpacity
-                key={mode}
-                onPress={() => setFulfillment(mode)}
-                style={[
-                  styles.groupButton,
-                  {
-                    backgroundColor: isSelected ? colors.primaryMuted : colors.surfaceRaised,
-                    borderColor: isSelected ? colors.primary : colors.border,
-                    borderRadius: radius.sm,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    typography.tiny,
-                    {
-                      color: isSelected ? colors.primary : colors.textSecondary,
-                      fontWeight: isSelected ? '700' : '500',
-                    },
-                  ]}
-                >
-                  {mode.replace('_', ' ').toUpperCase()}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-
-        {/* Step 4: Location Radius & Privacy */}
-        <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '700', marginTop: spacing.md, marginBottom: 8 }]}>
-          4. DISCOVERY RADIUS (HYDERABAD)
-        </Text>
-        <View style={styles.radiusSelector}>
-          {[1, 3, 5, 10, 20].map((km) => {
-            const isSelected = radiusKm === km;
-            return (
-              <TouchableOpacity
-                key={km}
-                onPress={() => setRadiusKm(km)}
-                style={[
-                  styles.radiusPill,
+                  styles.categoryPill,
                   {
                     backgroundColor: isSelected ? colors.primary : colors.surfaceRaised,
                     borderColor: isSelected ? colors.primary : colors.border,
@@ -294,61 +153,166 @@ export default function CreateRequestScreen() {
                     },
                   ]}
                 >
-                  {km} km
+                  {cat.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
+
+        {/* Step 2: What do you need? */}
+        <Input
+          label="What do you need?"
+          placeholder="e.g. 20 Pages Color Printout by 4 PM"
+          value={title}
+          onChangeText={setTitle}
+          containerStyle={{ marginBottom: spacing.md }}
+        />
+
+        <Input
+          label="Details or Instructions (Optional)"
+          placeholder="e.g. Need double sided 100gsm paper, will collect near DLF."
+          value={description}
+          onChangeText={setDescription}
+          multiline
+          numberOfLines={3}
+          style={{ minHeight: 70 }}
+          containerStyle={{ marginBottom: spacing.md }}
+        />
+
+        {/* Step 3: Priority Toggle (2 big simple buttons) */}
+        <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '700', marginBottom: 8 }]}>
+          HOW URGENT IS THIS?
+        </Text>
+        <View style={styles.urgencyRow}>
+          <TouchableOpacity
+            onPress={() => setUrgency('urgent')}
+            style={[
+              styles.urgencyButton,
+              {
+                backgroundColor: urgency === 'urgent' ? colors.urgentMuted : colors.surfaceRaised,
+                borderColor: urgency === 'urgent' ? colors.urgent : colors.border,
+                borderRadius: radius.md,
+              },
+            ]}
+          >
+            <Zap size={18} color={urgency === 'urgent' ? colors.urgent : colors.textSecondary} />
+            <Text
+              style={[
+                typography.bodyBold,
+                { color: urgency === 'urgent' ? colors.urgent : colors.text, marginLeft: 6 },
+              ]}
+            >
+              Urgent (Today)
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setUrgency('medium')}
+            style={[
+              styles.urgencyButton,
+              {
+                backgroundColor: urgency === 'medium' ? colors.primaryMuted : colors.surfaceRaised,
+                borderColor: urgency === 'medium' ? colors.primary : colors.border,
+                borderRadius: radius.md,
+              },
+            ]}
+          >
+            <Clock size={18} color={urgency === 'medium' ? colors.primary : colors.textSecondary} />
+            <Text
+              style={[
+                typography.bodyBold,
+                { color: urgency === 'medium' ? colors.primary : colors.text, marginLeft: 6 },
+              ]}
+            >
+              Flexible Time
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Step 4: Budget Quick Presets */}
+        <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '700', marginTop: spacing.md, marginBottom: 8 }]}>
+          OFFERED BUDGET (₹ INR)
+        </Text>
+        <View style={styles.presetRow}>
+          {budgetPresets.map((amt) => {
+            const isSelected = budget === amt;
+            return (
+              <TouchableOpacity
+                key={amt}
+                onPress={() => setBudget(amt)}
+                style={[
+                  styles.presetChip,
+                  {
+                    backgroundColor: isSelected ? colors.primary : colors.surfaceRaised,
+                    borderColor: isSelected ? colors.primary : colors.border,
+                    borderRadius: radius.md,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    typography.bodyBold,
+                    { color: isSelected ? colors.textInverse : colors.text },
+                  ]}
+                >
+                  ₹{amt}
                 </Text>
               </TouchableOpacity>
             );
           })}
         </View>
-        <Text style={[typography.tiny, { color: colors.textTertiary, marginTop: 4 }]}>
-          🔒 Your exact GPS coordinates will never be shown. A 500m fuzzy centroid is applied.
-        </Text>
 
-        {/* Step 5: Budget & Negotiation */}
-        <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '700', marginTop: spacing.md, marginBottom: 8 }]}>
-          5. BUDGET & PRICING
-        </Text>
         <Input
-          label="Estimated Budget (₹ INR)"
-          placeholder="e.g. 250 (Leave blank if open to bids)"
+          placeholder="Or enter custom budget (e.g. 350)"
           value={budget}
           onChangeText={setBudget}
           keyboardType="numeric"
           leftIcon={<IndianRupee size={16} color={colors.textTertiary} />}
-          containerStyle={{ marginBottom: spacing.sm }}
+          containerStyle={{ marginTop: 8, marginBottom: spacing.md }}
         />
 
+        {/* Negotiable Toggle */}
         <TouchableOpacity
           onPress={() => setIsNegotiable(!isNegotiable)}
-          style={[styles.negotiableToggle, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }]}
+          style={[styles.negotiableBox, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }]}
         >
-          <View>
-            <Text style={[typography.bodyBold, { color: colors.text }]}>Allow Price Negotiation</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={[typography.bodyBold, { color: colors.text }]}>Open to price negotiation</Text>
             <Text style={[typography.caption, { color: colors.textSecondary }]}>
-              Helpers can propose alternate prices and completion times
+              Allow helpers to propose alternate prices
             </Text>
           </View>
           <View
             style={[
-              styles.switchTrack,
-              { backgroundColor: isNegotiable ? colors.primary : colors.surfaceSubtle },
+              styles.checkCircle,
+              {
+                backgroundColor: isNegotiable ? colors.primary : 'transparent',
+                borderColor: isNegotiable ? colors.primary : colors.border,
+              },
             ]}
           >
-            <View
-              style={[
-                styles.switchThumb,
-                { transform: [{ translateX: isNegotiable ? 16 : 0 }] },
-              ]}
-            />
+            {isNegotiable && <Text style={{ color: '#000', fontSize: 12, fontWeight: '900' }}>✓</Text>}
           </View>
         </TouchableOpacity>
 
-        {/* Submit Button */}
+        {/* Locality Note */}
+        <View style={styles.localityNote}>
+          <MapPin size={13} color={colors.primary} />
+          <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: 4 }]}>
+            Location: <Text style={{ color: colors.text, fontWeight: '600' }}>Gachibowli, Hyderabad (5 km radius)</Text>
+          </Text>
+        </View>
+
+        {/* Big Submit Button */}
         <Button
-          title="Publish Request to Nearby Community"
-          onPress={handleSubmit}
+          title="Post Request to Neighbours"
+          variant="primary"
+          size="lg"
+          fullWidth
           loading={loading}
-          style={{ marginTop: spacing.xl }}
+          onPress={handleSubmit}
+          style={{ marginTop: spacing.lg }}
         />
       </ScrollView>
     </SafeAreaView>
@@ -360,78 +324,74 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    padding: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
     borderBottomWidth: 1,
   },
   form: {
     padding: 16,
   },
-  categoryCard: {
+  categoryPill: {
     paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingVertical: 8,
     borderWidth: 1,
   },
-  buttonGroup: {
+  urgencyRow: {
+    flexDirection: 'row',
+    gap: 10,
+  },
+  urgencyButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderWidth: 1,
+  },
+  presetRow: {
     flexDirection: 'row',
     gap: 8,
   },
-  groupButton: {
+  presetChip: {
     flex: 1,
     paddingVertical: 10,
-    borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  radiusSelector: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  radiusPill: {
-    paddingHorizontal: 14,
-    paddingVertical: 6,
     borderWidth: 1,
   },
-  negotiableToggle: {
+  negotiableBox: {
     flexDirection: 'row',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    alignItems: 'center',
     padding: 12,
-    borderRadius: 12,
+    borderRadius: 10,
     borderWidth: 1,
-    marginTop: 4,
   },
-  switchTrack: {
-    width: 40,
-    height: 24,
-    borderRadius: 12,
-    padding: 2,
+  checkCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    alignItems: 'center',
     justifyContent: 'center',
   },
-  switchThumb: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#FFFFFF',
+  localityNote: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 12,
   },
-  successContainer: {
+  successWrapper: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
   },
-  successBadge: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
+  successCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  summaryCard: {
-    width: '100%',
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    marginVertical: 20,
   },
 });

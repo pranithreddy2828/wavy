@@ -33,3 +33,4 @@ def test_feed_category_filter(client):
     data = response.get_json()
     for req in data["requests"]:
         assert req["category_slug"] == "printing"
+

@@ -1,17 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
-import { Card } from './ui/Card';
-import { Badge } from './ui/Badge';
 import { CommunityRequest } from '../services/requestsApi';
-import {
-  MapPin,
-  Clock,
-  MessageSquare,
-  ShieldCheck,
-  Star,
-  ChevronRight,
-} from 'lucide-react-native';
+import { MapPin, Star, ArrowRight, Zap } from 'lucide-react-native';
 
 export interface RequestCardProps {
   request: CommunityRequest;
@@ -21,114 +12,103 @@ export interface RequestCardProps {
 export const RequestCard: React.FC<RequestCardProps> = ({ request, onPress }) => {
   const { colors, spacing, typography, radius } = useTheme();
 
-  const getUrgencyBadge = () => {
-    switch (request.urgency) {
-      case 'urgent':
-        return <Badge label="URGENT" variant="urgent" size="sm" />;
-      case 'medium':
-        return <Badge label="Medium" variant="warning" size="sm" />;
-      case 'low':
-      default:
-        return <Badge label="Flexible" variant="neutral" size="sm" />;
-    }
-  };
-
   return (
-    <Card onPress={onPress} style={styles.card}>
-      {/* Header: Category Badge + Urgency Tag */}
-      <View style={styles.headerRow}>
-        <View style={styles.categoryContainer}>
-          <Badge
-            label={request.category_name}
-            variant="secondary"
-            size="sm"
-          />
-          <View style={styles.dot} />
-          <View style={styles.locationWrapper}>
-            <MapPin size={12} color={colors.textTertiary} />
-            <Text style={[typography.caption, { color: colors.textTertiary, marginLeft: 2 }]}>
-              {request.distance_km} km away
+    <TouchableOpacity
+      activeOpacity={0.88}
+      onPress={onPress}
+      style={[
+        styles.card,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+          borderRadius: radius.xl,
+        },
+      ]}
+    >
+      {/* Top Header: Category, Distance, and Urgency */}
+      <View style={styles.topRow}>
+        <View style={styles.categoryBadge}>
+          <Text style={[typography.caption, { color: colors.primary, fontWeight: '700' }]}>
+            {request.category_name}
+          </Text>
+          <View style={[styles.dot, { backgroundColor: colors.textTertiary }]} />
+          <MapPin size={13} color={colors.textSecondary} />
+          <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: 2 }]}>
+            {request.distance_km} km
+          </Text>
+        </View>
+
+        {request.urgency === 'urgent' && (
+          <View style={[styles.urgentChip, { backgroundColor: colors.urgentMuted, borderColor: colors.urgent }]}>
+            <Zap size={11} color={colors.urgent} />
+            <Text style={[typography.tiny, { color: colors.urgent, fontWeight: '800', marginLeft: 2 }]}>
+              URGENT
             </Text>
           </View>
-        </View>
-        {getUrgencyBadge()}
+        )}
       </View>
 
-      {/* Title & Description */}
-      <Text style={[typography.h4, { color: colors.text, marginTop: spacing.xs }]} numberOfLines={2}>
+      {/* Main Request Title */}
+      <Text style={[typography.h4, { color: colors.text, marginTop: spacing.xs, fontSize: 16 }]} numberOfLines={2}>
         {request.title}
       </Text>
+
+      {/* Area & Details snippet */}
       <Text
-        style={[typography.body, { color: colors.textSecondary, marginTop: spacing.xxs }]}
+        style={[typography.body, { color: colors.textSecondary, marginTop: 4 }]}
         numberOfLines={2}
       >
         {request.description}
       </Text>
 
-      {/* Locality & Fulfillment */}
-      <View style={[styles.metaRow, { marginTop: spacing.sm }]}>
-        <Text style={[typography.caption, { color: colors.primary, fontWeight: '600' }]}>
-          📍 {request.area_name}
-        </Text>
-        <Text style={[typography.caption, { color: colors.textTertiary }]}>
-          • Mode: {request.fulfillment_type.replace('_', ' ').toUpperCase()}
-        </Text>
-      </View>
-
-      {/* Divider */}
-      <View style={[styles.divider, { backgroundColor: colors.borderSubtle }]} />
-
-      {/* Footer: Requester Info + Budget / Action */}
-      <View style={styles.footerRow}>
-        <View style={styles.requesterInfo}>
-          <Text style={[typography.bodyBold, { color: colors.text }]}>
-            {request.requester.display_name}
+      {/* Bottom Bar: Price, Requester info, and Action */}
+      <View style={[styles.bottomBar, { borderTopColor: colors.borderSubtle }]}>
+        <View>
+          <Text style={[typography.tiny, { color: colors.textTertiary, textTransform: 'uppercase' }]}>
+            {request.is_negotiable ? 'Budget (Negotiable)' : 'Fixed Budget'}
           </Text>
-          <View style={styles.ratingRow}>
-            <Star size={12} color="#F59E0B" fill="#F59E0B" />
-            <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: 2 }]}>
-              {request.requester.rating_avg.toFixed(1)} ({request.requester.reviews_count})
-            </Text>
-            {request.requester.is_verified && (
-              <ShieldCheck size={14} color={colors.primary} style={{ marginLeft: 4 }} />
-            )}
-          </View>
-        </View>
-
-        <View style={styles.budgetContainer}>
-          <Text style={[typography.tiny, { color: colors.textTertiary }]}>
-            {request.is_negotiable ? 'BUDGET (NEG)' : 'FIXED BUDGET'}
-          </Text>
-          <Text style={[typography.h4, { color: colors.primary, fontWeight: '800' }]}>
+          <Text style={[typography.h3, { color: colors.primary, fontWeight: '900', marginTop: 1 }]}>
             ₹{request.budget ? request.budget.toFixed(0) : 'Open'}
           </Text>
         </View>
-      </View>
 
-      {/* Active Offers Indicator */}
-      {request.offers_count > 0 && (
-        <View style={[styles.offersRow, { backgroundColor: colors.surfaceSubtle, borderRadius: radius.sm }]}>
-          <MessageSquare size={12} color={colors.primary} />
-          <Text style={[typography.caption, { color: colors.primary, marginLeft: 4, fontWeight: '600' }]}>
-            {request.offers_count} {request.offers_count === 1 ? 'offer submitted' : 'offers submitted'}
-          </Text>
-          <ChevronRight size={14} color={colors.textTertiary} style={{ marginLeft: 'auto' }} />
+        <View style={styles.rightSide}>
+          <View style={styles.requesterBrief}>
+            <Text style={[typography.caption, { color: colors.text, fontWeight: '600' }]}>
+              {request.requester.display_name}
+            </Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Star size={11} color="#F59E0B" fill="#F59E0B" />
+              <Text style={[typography.tiny, { color: colors.textSecondary, marginLeft: 2 }]}>
+                {request.requester.rating_avg.toFixed(1)}
+              </Text>
+            </View>
+          </View>
+
+          <View style={[styles.actionButton, { backgroundColor: colors.primaryMuted, borderColor: colors.primary }]}>
+            <Text style={[typography.caption, { color: colors.primary, fontWeight: '700' }]}>
+              Help
+            </Text>
+            <ArrowRight size={13} color={colors.primary} style={{ marginLeft: 3 }} />
+          </View>
         </View>
-      )}
-    </Card>
+      </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   card: {
+    padding: 16,
+    borderWidth: 1,
     marginBottom: 12,
   },
-  headerRow: {
+  topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  categoryContainer: {
+  categoryBadge: {
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -136,43 +116,38 @@ const styles = StyleSheet.create({
     width: 3,
     height: 3,
     borderRadius: 2,
-    backgroundColor: '#64748B',
     marginHorizontal: 6,
   },
-  locationWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  divider: {
-    height: 1,
-    marginVertical: 10,
-  },
-  footerRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  requesterInfo: {
-    flex: 1,
-  },
-  ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 2,
-  },
-  budgetContainer: {
-    alignItems: 'flex-end',
-  },
-  offersRow: {
+  urgentChip: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
-    paddingVertical: 5,
-    marginTop: 10,
+    paddingVertical: 3,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  bottomBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 12,
+    paddingTop: 10,
+    borderTopWidth: 1,
+  },
+  rightSide: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  requesterBrief: {
+    alignItems: 'flex-end',
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
   },
 });

@@ -10,17 +10,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { Input } from '../../src/components/ui/Input';
 import { RequestCard } from '../../src/components/RequestCard';
-import { Badge } from '../../src/components/ui/Badge';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Skeleton } from '../../src/components/ui/Skeleton';
 import { fetchFeed, CommunityRequest } from '../../src/services/requestsApi';
 import {
   Search,
   MapPin,
-  Compass,
-  Sliders,
-  Map as MapIcon,
-  List,
   Navigation,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -31,11 +26,10 @@ export default function DiscoverScreen() {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRadius, setSelectedRadius] = useState<number>(5);
-  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [requests, setRequests] = useState<CommunityRequest[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const radiusOptions = [1, 3, 5, 10, 20];
+  const radiusOptions = [1, 5, 10, 20];
 
   useEffect(() => {
     setLoading(true);
@@ -47,78 +41,40 @@ export default function DiscoverScreen() {
 
   const filteredRequests = requests.filter((r) => {
     if (!searchQuery.trim()) return true;
-    const query = searchQuery.toLowerCase();
+    const q = searchQuery.toLowerCase();
     return (
-      r.title.toLowerCase().includes(query) ||
-      r.description.toLowerCase().includes(query) ||
-      r.category_name.toLowerCase().includes(query) ||
-      r.area_name.toLowerCase().includes(query)
+      r.title.toLowerCase().includes(q) ||
+      r.description.toLowerCase().includes(q) ||
+      r.category_name.toLowerCase().includes(q) ||
+      r.area_name.toLowerCase().includes(q)
     );
   });
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* Search & Header */}
+      {/* Header & Search */}
       <View style={[styles.header, { borderBottomColor: colors.borderSubtle }]}>
-        <View style={styles.titleRow}>
-          <View>
-            <Text style={[typography.h3, { color: colors.text, fontWeight: '800' }]}>
-              Discover Nearby
-            </Text>
-            <Text style={[typography.caption, { color: colors.textSecondary }]}>
-              Finding requests within {selectedRadius} km of Gachibowli
-            </Text>
-          </View>
+        <Text style={[typography.h3, { color: colors.text, fontWeight: '800' }]}>
+          Discover Nearby
+        </Text>
+        <Text style={[typography.caption, { color: colors.textSecondary }]}>
+          Explore community requests around Gachibowli, Hyderabad
+        </Text>
 
-          {/* Toggle Map / List view */}
-          <View
-            style={[
-              styles.viewToggle,
-              { backgroundColor: colors.surfaceRaised, borderColor: colors.border },
-            ]}
-          >
-            <TouchableOpacity
-              onPress={() => setViewMode('list')}
-              style={[
-                styles.toggleBtn,
-                viewMode === 'list' && { backgroundColor: colors.primary },
-              ]}
-            >
-              <List
-                size={16}
-                color={viewMode === 'list' ? colors.textInverse : colors.textSecondary}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => setViewMode('map')}
-              style={[
-                styles.toggleBtn,
-                viewMode === 'map' && { backgroundColor: colors.primary },
-              ]}
-            >
-              <MapIcon
-                size={16}
-                color={viewMode === 'map' ? colors.textInverse : colors.textSecondary}
-              />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Search Bar */}
         <Input
-          placeholder="Search requests, skills, or localities..."
+          placeholder="Search printing, laptop, tutoring, carpool..."
           value={searchQuery}
           onChangeText={setSearchQuery}
           leftIcon={<Search size={18} color={colors.textTertiary} />}
-          containerStyle={{ marginTop: spacing.md }}
+          containerStyle={{ marginTop: 12 }}
         />
 
-        {/* Radius Range Filter Chips */}
-        <View style={styles.radiusContainer}>
+        {/* Distance Selector */}
+        <View style={styles.radiusBar}>
           <Text style={[typography.caption, { color: colors.textTertiary, marginRight: 8 }]}>
-            Radius:
+            Distance:
           </Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 }}>
+          <View style={{ flexDirection: 'row', gap: 6 }}>
             {radiusOptions.map((km) => {
               const isSelected = selectedRadius === km;
               return (
@@ -143,98 +99,46 @@ export default function DiscoverScreen() {
                       },
                     ]}
                   >
-                    {km} km
+                    Within {km} km
                   </Text>
                 </TouchableOpacity>
               );
             })}
-          </ScrollView>
+          </View>
         </View>
       </View>
 
-      {/* Main Content Area */}
-      {viewMode === 'map' ? (
-        // OpenStreetMap Interactive Graphic Representation
-        <View style={styles.mapContainer}>
-          <View style={[styles.mapPlaceholder, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }]}>
-            <Compass size={48} color={colors.primary} />
-            <Text style={[typography.h4, { color: colors.text, marginTop: spacing.sm }]}>
-              OpenStreetMap Geodesic Radar
-            </Text>
-            <Text
-              style={[
-                typography.body,
-                { color: colors.textSecondary, textAlign: 'center', maxWidth: 280, marginTop: 4 },
-              ]}
-            >
-              Showing privacy-protected approximate centroids across Hyderabad ({filteredRequests.length} pins active within {selectedRadius} km).
-            </Text>
-
-            {/* Pins overview */}
-            <View style={styles.pinsSummary}>
-              {filteredRequests.map((req) => (
-                <View
-                  key={req.id}
-                  style={[
-                    styles.pinChip,
-                    { backgroundColor: colors.surfaceSubtle, borderColor: colors.border },
-                  ]}
-                >
-                  <MapPin size={12} color={colors.primary} />
-                  <Text style={[typography.caption, { color: colors.text, marginLeft: 4 }]}>
-                    {req.category_name} ({req.distance_km}km)
-                  </Text>
-                </View>
-              ))}
-            </View>
-
-            <TouchableOpacity
-              onPress={() => setViewMode('list')}
-              style={[styles.switchToListBtn, { backgroundColor: colors.primary, borderRadius: radius.md }]}
-            >
-              <Text style={[typography.bodyBold, { color: colors.textInverse }]}>
-                Switch to List Results
-              </Text>
-            </TouchableOpacity>
-          </View>
+      {/* Results List */}
+      <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 90 }]}>
+        <View style={styles.resultsInfo}>
+          <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '600' }]}>
+            {filteredRequests.length} {filteredRequests.length === 1 ? 'REQUEST' : 'REQUESTS'} AVAILABLE
+          </Text>
         </View>
-      ) : (
-        <ScrollView contentContainerStyle={[styles.content, { paddingBottom: 90 }]}>
-          <View style={styles.resultsBar}>
-            <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '600' }]}>
-              {filteredRequests.length} {filteredRequests.length === 1 ? 'RESULT' : 'RESULTS'} FOUND
-            </Text>
-            <View style={styles.privacyShield}>
-              <Text style={[typography.tiny, { color: colors.primary, fontWeight: '700' }]}>
-                🔒 500M PRIVACY MASK ACTIVE
-              </Text>
-            </View>
-          </View>
 
-          {loading ? (
-            <View style={{ gap: spacing.md }}>
-              <Skeleton height={140} borderRadius={radius.lg} />
-              <Skeleton height={140} borderRadius={radius.lg} />
-            </View>
-          ) : filteredRequests.length > 0 ? (
-            filteredRequests.map((req) => (
-              <RequestCard
-                key={req.id}
-                request={req}
-                onPress={() => router.push(`/requests/${req.id}` as any)}
-              />
-            ))
-          ) : (
-            <EmptyState
-              icon={<Navigation size={36} color={colors.primary} />}
-              title="No Requests in this Radius"
-              description={`Try expanding your search radius to 10 km or 20 km to see requests in neighbouring areas.`}
-              actionTitle="Expand to 20 km"
-              onAction={() => setSelectedRadius(20)}
+        {loading ? (
+          <View style={{ gap: spacing.md }}>
+            <Skeleton height={130} borderRadius={radius.xl} />
+            <Skeleton height={130} borderRadius={radius.xl} />
+          </View>
+        ) : filteredRequests.length > 0 ? (
+          filteredRequests.map((req) => (
+            <RequestCard
+              key={req.id}
+              request={req}
+              onPress={() => router.push(`/requests/${req.id}` as any)}
             />
-          )}
-        </ScrollView>
-      )}
+          ))
+        ) : (
+          <EmptyState
+            icon={<Navigation size={36} color={colors.primary} />}
+            title="No requests within this radius"
+            description="Broaden your distance filter to 10 km or 20 km to see requests in surrounding areas."
+            actionTitle="Expand to 20 km"
+            onAction={() => setSelectedRadius(20)}
+          />
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -244,79 +148,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    padding: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 14,
     borderBottomWidth: 1,
   },
-  titleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  viewToggle: {
-    flexDirection: 'row',
-    borderRadius: 8,
-    borderWidth: 1,
-    padding: 2,
-  },
-  toggleBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  radiusContainer: {
+  radiusBar: {
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 12,
   },
   radiusChip: {
     paddingHorizontal: 12,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderWidth: 1,
   },
   content: {
     padding: 16,
   },
-  resultsBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+  resultsInfo: {
     marginBottom: 12,
-  },
-  privacyShield: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  mapContainer: {
-    flex: 1,
-    padding: 16,
-  },
-  mapPlaceholder: {
-    flex: 1,
-    borderRadius: 16,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  pinsSummary: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    justifyContent: 'center',
-    marginTop: 16,
-  },
-  pinChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    borderWidth: 1,
-  },
-  switchToListBtn: {
-    paddingHorizontal: 18,
-    paddingVertical: 10,
-    marginTop: 20,
   },
 });

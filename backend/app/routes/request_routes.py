@@ -142,3 +142,4 @@ def get_feed():
         "city": "Hyderabad",
         "timestamp": datetime.now(timezone.utc).isoformat()
     }), 200
+

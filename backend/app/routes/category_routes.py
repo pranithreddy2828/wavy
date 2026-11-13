@@ -28,3 +28,4 @@ def get_categories():
         "categories": CANONICAL_CATEGORIES,
         "total": len(CANONICAL_CATEGORIES)
     }), 200
+
