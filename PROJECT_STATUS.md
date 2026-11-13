@@ -2,8 +2,8 @@
 
 **Last Updated:** 2026-11-13  
 **Target Platform:** Android First (iOS-Ready)  
-**Primary Tech Stack:** React Native (Expo SDK 52, TypeScript), Python Flask REST API + Socket.IO, MySQL 8+  
-**Current Milestone:** MILESTONE 1 — Foundation & Environment Setup (COMPLETED)  
+**Primary Tech Stack:** React Native (Expo SDK 58, TypeScript), Python Flask REST API + Socket.IO, MySQL 8+  
+**Current Milestone:** MILESTONE 2 — UI/UX & Design System (COMPLETED)  
 
 ---
 
@@ -12,71 +12,77 @@
 | Milestone | Title | Status | Description |
 |---|---|---|---|
 | **M1** | **Foundation & Setup** | 🟢 **COMPLETED** | Architecture, repositories, schemas, Flask backend, Expo TS app, test suite |
-| **M2** | **UI/UX & Design System** | 🟡 **NEXT** | Theme tokens, navigation shells, splash, welcome, tab bars, skeleton loader |
-| **M3** | **Authentication & Security** | ⚪ PENDING | Google Auth, Email verification, JWT refresh rotation, sessions |
-| **M4** | **Request Management** | ⚪ PENDING | Categorized request lifecycle, CRUD, filtering |
-| **M5** | **Offer & Negotiation Engine** | ⚪ PENDING | Offers, counter-offers, state machine transitions, transactions |
+| **M2** | **UI/UX & Design System** | 🟢 **COMPLETED** | 2026 Design tokens, 5-tab navigation, custom floating create trigger, discovery radar, profile, auth shells |
+| **M3** | **Authentication & Security** | 🟡 **NEXT** | Google OAuth token verification, email verification, JWT refresh rotation, secure sessions |
+| **M4** | **Request Management** | ⚪ PENDING | Full CRUD, lifecycle state machine, attachment uploads, category management |
+| **M5** | **Offer & Negotiation Engine** | ⚪ PENDING | Submit offers, counter-offer history, race condition locking, accept/reject |
 | **M6** | **Real-Time Messaging** | ⚪ PENDING | Socket.IO duplex chat, attachments, push notifications |
-| **M7** | **Location & Discovery** | ⚪ PENDING | OpenStreetMap, radius search, approximate masking |
-| **M8** | **Safety, Privacy & Trust** | ⚪ PENDING | Reporting, blocking, DPDP compliance, review & reputation |
+| **M7** | **Location & Discovery** | ⚪ PENDING | OpenStreetMap integration, Haversine radius, 500m coordinate obfuscation |
+| **M8** | **Safety, Privacy & Trust** | ⚪ PENDING | DPDP compliance, reporting, blocking, mutual review eligibility |
 | **M9** | **Admin Dashboard** | ⚪ PENDING | Web console for moderation, users, categories, analytics |
 | **M10** | **Testing & Hardening** | ⚪ PENDING | Unit, integration, E2E, penetration & security audit |
 | **M11** | **Production & Play Store** | ⚪ PENDING | Release builds, APK/AAB signing, deployment, store prep |
 
 ---
 
-## 2. Milestone 1 Completed Deliverables
+## 2. Milestone 2 Completed Deliverables
 
-- [x] **Git Repository Initialized:** First commit recorded with clean `.gitignore`.
-- [x] **Database Schema:** 23 normalized tables in [database/schema.sql](file:///c:/Users/Home/Desktop/wavy/database/schema.sql) with spatial, audit, and DPDP support.
-- [x] **Category Seed Script:** 14 categories in [database/seed_categories.sql](file:///c:/Users/Home/Desktop/wavy/database/seed_categories.sql).
-- [x] **Flask Backend Scaffold:**
-  - Python 3.13 Virtual Environment (`backend/venv`).
-  - Application factory in [backend/app/__init__.py](file:///c:/Users/Home/Desktop/wavy/backend/app/__init__.py).
-  - Versioned routing (`/api/v1/`) with `/api/v1/health` diagnostic endpoint in [backend/app/routes/health_routes.py](file:///c:/Users/Home/Desktop/wavy/backend/app/routes/health_routes.py).
-  - Environment-driven configurations with PyMySQL pool management in [backend/app/config.py](file:///c:/Users/Home/Desktop/wavy/backend/app/config.py).
-  - Pytest unit tests passing 100% in [backend/tests/test_health.py](file:///c:/Users/Home/Desktop/wavy/backend/tests/test_health.py).
-- [x] **Expo Mobile App Scaffold:**
-  - Upgraded to Expo SDK 58 (aligned with latest Expo Go app on device/emulator) with React Native 0.88 & React 19.
-  - Zero TypeScript compilation errors (`tsc --noEmit` verified).
-  - Theme design tokens in [mobile/src/theme/colors.ts](file:///c:/Users/Home/Desktop/wavy/mobile/src/theme/colors.ts).
-  - Adaptive Axios client in [mobile/src/services/api.ts](file:///c:/Users/Home/Desktop/wavy/mobile/src/services/api.ts).
-  - Interactive System Hub screen with live backend ping in [mobile/app/index.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/index.tsx).
+- [x] **2026 Design System Architecture:**
+  - [mobile/src/theme/colors.ts](file:///c:/Users/Home/Desktop/wavy/mobile/src/theme/colors.ts): Flagship Obsidian/Teal dark theme & Crisp Slate light theme.
+  - [mobile/src/theme/typography.ts](file:///c:/Users/Home/Desktop/wavy/mobile/src/theme/typography.ts): Complete typography scale with weights and letter spacing.
+  - [mobile/src/theme/spacing.ts](file:///c:/Users/Home/Desktop/wavy/mobile/src/theme/spacing.ts): 4px/8px modular grid, corner radii, and shadow elevations.
+  - [mobile/src/theme/ThemeContext.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/src/theme/ThemeContext.tsx): Dynamic `useTheme()` hook with instant dark/light toggle.
+- [x] **Reusable UI Component Library:**
+  - `Button` (primary, secondary, outline, ghost, danger, loading states).
+  - `Card` (surface, raised, highlight variants with elevation).
+  - `Badge` (urgency tags, categories, verification status).
+  - `Skeleton` (animated pulsing loading placeholders).
+  - `EmptyState` (zero-state illustrations and call-to-actions).
+  - `Input` (focus states, error display, prefix/suffix icons).
+- [x] **5-Section Tab Navigation Shell:**
+  - [mobile/app/(tabs)/_layout.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/_layout.tsx): Custom tab bar with prominent raised center action for `Create Request`.
+  - **1. Home Feed:** [mobile/app/(tabs)/index.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/index.tsx) with category carousel, urgency filters, and live request cards.
+  - **2. Discover Radar:** [mobile/app/(tabs)/discover.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/discover.tsx) with search, radius chips (1, 3, 5, 10, 20 km), and list/map view switcher.
+  - **3. Create Request Wizard:** [mobile/app/(tabs)/create.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/create.tsx) with 5-step form (category, details, priority, radius, budget/negotiable).
+  - **4. Activity Dashboard:** [mobile/app/(tabs)/activity.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/activity.tsx) (Ongoing, My Requests, My Offers, Completed).
+  - **5. User Profile & Trust:** [mobile/app/(tabs)/profile.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/profile.tsx) (Reputation, verification badges, skills, services offered, theme toggle, DPDP settings).
+- [x] **Authentication & Onboarding Shells:**
+  - [mobile/app/(auth)/welcome.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/welcome.tsx): 3-slide value proposition carousel.
+  - [mobile/app/(auth)/login.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/login.tsx): Google one-tap & email/password authentication preview.
+  - [mobile/app/(auth)/register.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/register.tsx): DPDP-compliant registration form.
+- [x] **Dynamic Detail Screen:**
+  - [mobile/app/requests/[id].tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/requests/[id].tsx): Full requirement breakdown, privacy location mask, and offer submission form.
+- [x] **Backend Feed & Categories API:**
+  - `GET /api/v1/categories` returning all 14 canonical categories.
+  - `GET /api/v1/requests/feed` supporting category, urgency, and distance filtering.
+  - Pytest suite: 5/5 passed.
+- [x] **Verification:**
+  - `npx tsc --noEmit` verified with **0 errors**.
 
 ---
 
 ## 3. Implemented Features
-- `/api/v1/health` diagnostic endpoint with database ping and service metrics.
-- Global 404 & 500 JSON error handling interceptors.
-- Mobile health test UI with latency measurement and diagnostic output.
+- Full 2026 UI/UX design system with live dark/light mode toggle.
+- 5 main application tabs with custom floating navigation.
+- Category filtering and urgency prioritizing.
+- Discovery radius filtering (1km to 20km).
+- Request creation wizard with negotiable budget toggles.
+- Activity engagement tracker.
+- User profile reputation metrics and verification indicators.
+- Backend Category and Request feed REST API endpoints.
 
 ---
 
 ## 4. Pending Features
-- Milestone 2: Design system tokens, Tab navigation, Welcome & Auth screens, Home feed skeleton.
+- Milestone 3: Google Identity Services verification, Email OTP registration, JWT access/refresh token rotation, SecureStore persistence, Argon2id password hashing on backend.
 
 ---
 
-## 5. Known Bugs & Issues
-- None.
-
----
-
-## 6. Database Changes
-- Initial schema created with UUID primary keys, Argon2id storage, fuzzy coordinates, and audit trail tables.
-
----
-
-## 7. API Changes
-- Root API prefix: `/api/v1/`
-- Endpoint added: `GET /api/v1/health`
-
----
-
-## 8. Next Steps
-1. User confirmation of Milestone 1 completion.
-2. Proceed to **MILESTONE 2 — UI/UX & Design System**:
-   - Implement complete 5-section bottom tab navigation (Home, Discover, Create Request, Activity, Profile).
-   - Design and build the 2026-grade WAVY design system (Obsidian/Teal dark theme, typography, cards, button primitives).
-   - Build Splash & Welcome screens.
-   - Build Home & Discover feeds with skeleton loading and empty states.
+## 5. Next Steps
+1. User confirmation of Milestone 2 completion.
+2. Begin **MILESTONE 3 — Authentication & Security System**:
+   - Backend User SQLAlchemy models & Argon2id password hasher.
+   - JWT token generator with refresh token family rotation.
+   - Google Sign-In backend token verification.
+   - Frontend authentication store with Zustand & Expo SecureStore.
+   - Auth guards & automatic session refresh interceptors.
