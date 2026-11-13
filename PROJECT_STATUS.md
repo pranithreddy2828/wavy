@@ -37,7 +37,7 @@
   - Environment-driven configurations with PyMySQL pool management in [backend/app/config.py](file:///c:/Users/Home/Desktop/wavy/backend/app/config.py).
   - Pytest unit tests passing 100% in [backend/tests/test_health.py](file:///c:/Users/Home/Desktop/wavy/backend/tests/test_health.py).
 - [x] **Expo Mobile App Scaffold:**
-  - Expo SDK 52 + TypeScript + Expo Router.
+  - Upgraded to Expo SDK 58 (aligned with latest Expo Go app on device/emulator) with React Native 0.88 & React 19.
   - Zero TypeScript compilation errors (`tsc --noEmit` verified).
   - Theme design tokens in [mobile/src/theme/colors.ts](file:///c:/Users/Home/Desktop/wavy/mobile/src/theme/colors.ts).
   - Adaptive Axios client in [mobile/src/services/api.ts](file:///c:/Users/Home/Desktop/wavy/mobile/src/services/api.ts).
