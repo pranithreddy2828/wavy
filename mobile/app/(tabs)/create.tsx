@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme/ThemeContext';
@@ -17,6 +18,7 @@ import {
   IndianRupee,
   MapPin,
   Sparkles,
+  ArrowLeft,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
@@ -33,6 +35,20 @@ export default function CreateRequestScreen() {
   const [submitted, setSubmitted] = useState(false);
 
   const budgetOptions = ['100', '200', '500', '1000'];
+
+  // Handle hardware & gesture back button on Android
+  useEffect(() => {
+    const onBackPress = () => {
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace('/');
+      }
+      return true;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
+  }, [router]);
 
   useEffect(() => {
     fetchCategories()
@@ -107,14 +123,31 @@ export default function CreateRequestScreen() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* Google-Style Header */}
+      {/* Google-Style Header with Back Button */}
       <View style={[styles.header, { borderBottomColor: colors.borderSubtle }]}>
-        <Text style={[typography.h3, { color: colors.text, fontWeight: '800' }]}>
-          Ask for Help
-        </Text>
-        <Text style={[typography.caption, { color: colors.textSecondary }]}>
-          Post a request to neighbours in Hyderabad
-        </Text>
+        <View style={styles.headerLeft}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace('/');
+              }
+            }}
+            style={[styles.backBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          >
+            <ArrowLeft size={18} color={colors.text} />
+          </TouchableOpacity>
+          <View style={{ marginLeft: 12 }}>
+            <Text style={[typography.h3, { color: colors.text, fontWeight: '800' }]}>
+              Ask for Help
+            </Text>
+            <Text style={[typography.caption, { color: colors.textSecondary }]}>
+              Post a request to neighbours in Hyderabad
+            </Text>
+          </View>
+        </View>
       </View>
 
       <ScrollView contentContainerStyle={[styles.form, { paddingBottom: 100 }]}>
@@ -246,6 +279,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 14,
     borderBottomWidth: 1,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   form: {
     padding: 20,

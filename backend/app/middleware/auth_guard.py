@@ -46,6 +46,28 @@ def jwt_required(f):
 
     return decorated_function
 
+def optional_jwt(f):
+    """
+    Middleware decorator that extracts JWT if present, but allows anonymous guest requests if absent.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        g.current_user = None
+        auth_header = request.headers.get("Authorization", None)
+        if auth_header and auth_header.startswith("Bearer "):
+            token = auth_header.split(" ")[1]
+            try:
+                payload = AuthService.verify_access_token(token)
+                user_id = payload.get("sub")
+                user = db.session.get(User, user_id)
+                if user and user.is_active:
+                    g.current_user = user
+            except Exception:
+                g.current_user = None
+        return f(*args, **kwargs)
+
+    return decorated_function
+
 def role_required(*allowed_roles):
     """Restricts access to specific user roles (e.g. 'admin', 'moderator')."""
     def decorator(f):
@@ -58,5 +80,6 @@ def role_required(*allowed_roles):
                     "message": "You do not have permission to access this resource."
                 }), 403
             return f(*args, **kwargs)
+
         return decorated_function
     return decorator

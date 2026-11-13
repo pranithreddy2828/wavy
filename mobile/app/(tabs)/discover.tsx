@@ -5,6 +5,7 @@ import {
   View,
   ScrollView,
   TouchableOpacity,
+  BackHandler,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme/ThemeContext';
@@ -13,7 +14,7 @@ import { RequestCard } from '../../src/components/RequestCard';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { Skeleton } from '../../src/components/ui/Skeleton';
 import { fetchFeed, CommunityRequest } from '../../src/services/requestsApi';
-import { Search, Navigation } from 'lucide-react-native';
+import { Search, Navigation, ArrowLeft } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
 export default function DiscoverScreen() {
@@ -26,6 +27,20 @@ export default function DiscoverScreen() {
   const [loading, setLoading] = useState(true);
 
   const radiusOptions = [1, 5, 10, 20];
+
+  // Hardware back button support
+  useEffect(() => {
+    const onBackPress = () => {
+      if (router.canGoBack()) {
+        router.back();
+      } else {
+        router.replace('/');
+      }
+      return true;
+    };
+    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    return () => sub.remove();
+  }, [router]);
 
   useEffect(() => {
     setLoading(true);
@@ -48,14 +63,31 @@ export default function DiscoverScreen() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* Google-Style Top Search */}
+      {/* Google-Style Top Search with Back Button */}
       <View style={[styles.header, { borderBottomColor: colors.borderSubtle }]}>
-        <Input
-          placeholder="Search requests (printing, laptop, ride...)"
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          leftIcon={<Search size={18} color={colors.textTertiary} />}
-        />
+        <View style={styles.searchRow}>
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={() => {
+              if (router.canGoBack()) {
+                router.back();
+              } else {
+                router.replace('/');
+              }
+            }}
+            style={[styles.backBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          >
+            <ArrowLeft size={18} color={colors.text} />
+          </TouchableOpacity>
+          <View style={{ flex: 1 }}>
+            <Input
+              placeholder="Search requests (printing, laptop, ride...)"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              leftIcon={<Search size={18} color={colors.textTertiary} />}
+            />
+          </View>
+        </View>
 
         {/* Distance Range Chips */}
         <View style={styles.radiusRow}>
@@ -136,6 +168,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
+  },
+  searchRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  backBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   radiusRow: {
     flexDirection: 'row',

@@ -1,145 +1,90 @@
-from flask import Blueprint, jsonify, request
-from datetime import datetime, timezone
+from flask import Blueprint, jsonify, request, g
+from app.services.request_service import RequestService
+from app.middleware.auth_guard import jwt_required, optional_jwt
 
 request_bp = Blueprint("requests", __name__, url_prefix="/requests")
 
-# Initial realistic Hyderabad seed requests for UI/UX exploration
-INITIAL_HYDERABAD_REQUESTS = [
-    {
-        "id": "req-001",
-        "title": "Need 25 Pages Color Printing Urgently",
-        "description": "Final semester thesis printout needed near DLF Cybercity by 5 PM today. Double-sided 100gsm paper preferred.",
-        "category_slug": "printing",
-        "category_name": "Printing",
-        "category_icon": "printer",
-        "urgency": "urgent",
-        "budget": 200.00,
-        "is_negotiable": True,
-        "fulfillment_type": "pickup",
-        "area_name": "Gachibowli, Hyderabad",
-        "distance_km": 1.2,
-        "requester": {
-            "display_name": "Rahul Verma",
-            "rating_avg": 4.9,
-            "reviews_count": 14,
-            "is_verified": True
-        },
-        "offers_count": 3,
-        "created_at": "2026-11-13T12:30:00Z"
-    },
-    {
-        "id": "req-002",
-        "title": "Travel Coordination: Gachibowli to Uppal",
-        "description": "Looking for carpool/shared travel companionship towards Uppal Metro station this evening around 6:30 PM. Contributing towards fuel.",
-        "category_slug": "transportation",
-        "category_name": "Transportation",
-        "category_icon": "car",
-        "urgency": "medium",
-        "budget": 250.00,
-        "is_negotiable": False,
-        "fulfillment_type": "on_premise",
-        "area_name": "HITEC City, Hyderabad",
-        "distance_km": 2.8,
-        "requester": {
-            "display_name": "Priya Sharma",
-            "rating_avg": 5.0,
-            "reviews_count": 22,
-            "is_verified": True
-        },
-        "offers_count": 1,
-        "created_at": "2026-11-13T13:10:00Z"
-    },
-    {
-        "id": "req-003",
-        "title": "1-on-1 Python Debugging & Asyncio Help",
-        "description": "Need an experienced developer to help troubleshoot an async task queue worker deadlock. Can meet at Starbucks Jubilee Hills or Google Meet.",
-        "category_slug": "tutoring",
-        "category_name": "Tutoring",
-        "category_icon": "graduation-cap",
-        "urgency": "medium",
-        "budget": 800.00,
-        "is_negotiable": True,
-        "fulfillment_type": "remote",
-        "area_name": "Jubilee Hills, Hyderabad",
-        "distance_km": 4.5,
-        "requester": {
-            "display_name": "Ananya Reddy",
-            "rating_avg": 4.8,
-            "reviews_count": 8,
-            "is_verified": True
-        },
-        "offers_count": 4,
-        "created_at": "2026-11-13T11:00:00Z"
-    },
-    {
-        "id": "req-004",
-        "title": "MacBook Air M2 Screen Flickering Diagnosis",
-        "description": "Display flickers when opening lid past 90 degrees. Looking for a certified technician to inspect ribbon cable before taking it to authorized service.",
-        "category_slug": "laptop-repair",
-        "category_name": "Laptop Repair",
-        "category_icon": "laptop",
-        "urgency": "low",
-        "budget": 500.00,
-        "is_negotiable": True,
-        "fulfillment_type": "on_premise",
-        "area_name": "Madhapur, Hyderabad",
-        "distance_km": 3.1,
-        "requester": {
-            "display_name": "Karthik Nair",
-            "rating_avg": 4.95,
-            "reviews_count": 31,
-            "is_verified": True
-        },
-        "offers_count": 2,
-        "created_at": "2026-11-13T09:45:00Z"
-    },
-    {
-        "id": "req-005",
-        "title": "Urgent Medicine Pickup from Apollo Pharmacy",
-        "description": "Need prescription medicines picked up from Apollo Jubilee Hills and delivered to Banjara Hills Road No. 12. Elder care assistance.",
-        "category_slug": "shopping-assistance",
-        "category_name": "Shopping Assistance",
-        "category_icon": "shopping-bag",
-        "urgency": "urgent",
-        "budget": 150.00,
-        "is_negotiable": True,
-        "fulfillment_type": "delivery",
-        "area_name": "Banjara Hills, Hyderabad",
-        "distance_km": 5.0,
-        "requester": {
-            "display_name": "Suresh Babu",
-            "rating_avg": 5.0,
-            "reviews_count": 5,
-            "is_verified": True
-        },
-        "offers_count": 5,
-        "created_at": "2026-11-13T13:40:00Z"
-    }
-]
+@request_bp.route("", methods=["POST"])
+@optional_jwt
+def create_request():
+    """Create a new community assistance request."""
+    data = request.get_json(silent=True) or {}
+    title = data.get("title")
+    description = data.get("description", "")
+    category_id = data.get("category_id", 1)
+    urgency = data.get("urgency", "urgent")
+    budget = data.get("budget", 200.0)
+    area_name = data.get("area_name", "Gachibowli")
+    city = data.get("city", "Hyderabad")
+    visibility_radius_km = data.get("visibility_radius_km", 5)
 
-@request_bp.route("/feed", methods=["GET"])
-def get_feed():
-    """Fetch nearby requests with optional category, urgency, and distance filtering."""
-    category = request.args.get("category")
-    urgency = request.args.get("urgency")
-    max_distance = request.args.get("max_distance", type=float)
+    if not title:
+        return jsonify({"error": "VALIDATION_ERROR", "message": "title is required"}), 400
 
-    filtered = INITIAL_HYDERABAD_REQUESTS
+    # If guest (not logged in), associate with demo user
+    user_id = g.current_user.id if hasattr(g, "current_user") and g.current_user else None
+    if not user_id:
+        from app.models.user import User
+        demo_user = User.query.first()
+        user_id = demo_user.id if demo_user else None
 
-    if category and category != "all":
-        filtered = [r for r in filtered if r["category_slug"] == category]
+    if not user_id:
+        RequestService.seed_initial_demo_data_if_empty()
+        from app.models.user import User
+        user_id = User.query.first().id
 
-    if urgency and urgency != "all":
-        filtered = [r for r in filtered if r["urgency"] == urgency]
-
-    if max_distance:
-        filtered = [r for r in filtered if r["distance_km"] <= max_distance]
+    new_req = RequestService.create_request(
+        user_id=user_id,
+        category_id=int(category_id),
+        title=title,
+        description=description,
+        urgency=urgency,
+        budget=float(budget) if budget is not None else None,
+        visibility_radius_km=int(visibility_radius_km),
+        area_name=area_name,
+        city=city,
+    )
 
     return jsonify({
         "success": True,
-        "requests": filtered,
-        "total": len(filtered),
+        "message": "Broadcast sent to nearby neighbours.",
+        "request": new_req.to_dict(),
+    }), 201
+
+@request_bp.route("/feed", methods=["GET"])
+def get_feed():
+    """Retrieve filtered requests with dynamic Haversine distance calculations."""
+    max_dist = float(request.args.get("max_distance", 20.0))
+    cat_slug = request.args.get("category")
+    urgency = request.args.get("urgency")
+    search = request.args.get("q")
+    lat = float(request.args.get("lat", 17.4401))
+    lon = float(request.args.get("lon", 78.3489))
+
+    requests_list = RequestService.get_feed(
+        current_lat=lat,
+        current_lon=lon,
+        max_distance_km=max_dist,
+        category_slug=cat_slug,
+        urgency=urgency,
+        search_query=search,
+    )
+
+    return jsonify({
+        "success": True,
         "city": "Hyderabad",
-        "timestamp": datetime.now(timezone.utc).isoformat()
+        "count": len(requests_list),
+        "requests": requests_list,
     }), 200
 
+@request_bp.route("/<string:request_id>", methods=["GET"])
+def get_request_detail(request_id):
+    """Retrieve single request specifications with privacy-masked location."""
+    req = RequestService.get_request_by_id(request_id)
+    if not req:
+        return jsonify({"error": "NOT_FOUND", "message": "Request not found"}), 404
+
+    return jsonify({
+        "success": True,
+        "request": req.to_dict(),
+    }), 200

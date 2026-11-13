@@ -39,13 +39,16 @@
   - `Skeleton` (animated pulsing loading placeholders).
   - `EmptyState` (zero-state illustrations and call-to-actions).
   - `Input` (focus states, error display, prefix/suffix icons).
-- [x] **5-Section Tab Navigation Shell:**
-  - Redesigned flagship Home Screen: Focused, circular "Ask for Help" button with expanding concentric animated radar pulse rings in Google Blue.
-  - Locality indicator chip ("Gachibowli, Hyderabad") and quick access to nearby requests radar.
-  - Discover tab with search and 1km/5km/10km/20km distance filters.
-  - Streamlined "Ask Help" creation form with one-tap budget presets.
-  - User Profile & Activity tracking tabs.
-  - Login / Auth stack removed as per user request to allow frictionless direct access to the entire application.
+- [x] **Google App Simplified Navigation Architecture:**
+  - **Minimalist Radar Home:** Single circular "Ask for Help" button with continuous native concentric radar waves and caption.
+  - **Zero Bottom Tabs on Home:** Bottom tab bar completely hidden (`tabBarStyle: { display: 'none' }`), eliminating cluttered bottom tabs.
+  - **Top-Right Google Profile Button:** Circular avatar chip ("RV") in the top header that opens the unified Profile & Account hub.
+  - **Unified Profile & Account Hub ([mobile/app/(tabs)/profile.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/profile.tsx)):**
+    - Seamless Back button returning to Home.
+    - Google-style identity card (initials avatar, email, locality, bio, verified badges).
+    - **Integrated Activity Dashboard:** Tabbed ongoing, my requests, my offers, and completed history with prices, statuses, and ETAs.
+    - **Integrated Settings & Preferences:** Live Dark/Light theme switch, Urgent broadcast alerts switch, DPDP Act 1km fuzzy location masking switch, safety contacts, data export, and sign out.
+- [x] **Continuous Native Spring Physics:** Smooth transition gliding center button to bottom docked circle with zero layout jumps.
 - [x] **Authentication & Onboarding Shells:**
   - [mobile/app/(auth)/welcome.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/welcome.tsx): 3-slide value proposition carousel.
   - [mobile/app/(auth)/login.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/login.tsx): Google one-tap & email/password authentication preview.

@@ -14,20 +14,29 @@ def create_app(config_name=None):
     if config_name is None:
         config_name = os.getenv("FLASK_ENV", "development")
 
-    app = Flask(__name__)
-    app.config.from_object(config_by_name.get(config_name, config_by_name["development"]))
+    server = Flask(__name__)
+    server.config.from_object(config_by_name.get(config_name, config_by_name["development"]))
 
     # Initialize extensions with app context
-    CORS(app, resources={r"/api/*": {"origins": app.config["CORS_ORIGINS"]}})
-    db.init_app(app)
-    socketio.init_app(app)
+    CORS(server, resources={r"/api/*": {"origins": server.config["CORS_ORIGINS"]}})
+    db.init_app(server)
+    socketio.init_app(server)
+
+    with server.app_context():
+        import app.models  # noqa: F401
+        db.create_all()
+        try:
+            from app.services.request_service import RequestService
+            RequestService.seed_initial_demo_data_if_empty()
+        except Exception:
+            pass
 
     # Register blueprints
     from app.routes import api_v1
-    app.register_blueprint(api_v1)
+    server.register_blueprint(api_v1)
 
     # Global 404 handler
-    @app.errorhandler(404)
+    @server.errorhandler(404)
     def resource_not_found(e):
         return jsonify({
             "error": "RESOURCE_NOT_FOUND",
@@ -35,12 +44,11 @@ def create_app(config_name=None):
         }), 404
 
     # Global 500 handler
-    @app.errorhandler(500)
+    @server.errorhandler(500)
     def internal_server_error(e):
         return jsonify({
             "error": "INTERNAL_SERVER_ERROR",
             "message": "An unexpected server error occurred."
         }), 500
 
-    return app
-
+    return server
