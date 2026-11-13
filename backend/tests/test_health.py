@@ -24,3 +24,4 @@ def test_not_found_endpoint(client):
     assert response.status_code == 404
     data = response.get_json()
     assert data["error"] == "RESOURCE_NOT_FOUND"
+

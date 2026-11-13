@@ -22,3 +22,4 @@ ON DUPLICATE KEY UPDATE
     icon_name=VALUES(icon_name),
     display_order=VALUES(display_order),
     is_active=VALUES(is_active);
+

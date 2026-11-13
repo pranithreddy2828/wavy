@@ -28,3 +28,4 @@ def health_check():
             "error": db_error
         }
     }), 200 if db_status == "connected" else 200
+

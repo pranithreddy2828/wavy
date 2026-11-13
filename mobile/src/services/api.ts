@@ -48,3 +48,4 @@ export const checkApiHealth = async (): Promise<HealthCheckResponse> => {
   const response = await apiClient.get<HealthCheckResponse>('/health');
   return response.data;
 };
+
