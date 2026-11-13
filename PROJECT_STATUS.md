@@ -40,12 +40,13 @@
   - `EmptyState` (zero-state illustrations and call-to-actions).
   - `Input` (focus states, error display, prefix/suffix icons).
 - [x] **5-Section Tab Navigation Shell:**
-  - [mobile/app/(tabs)/_layout.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/_layout.tsx): Custom tab bar with prominent raised center action for `Create Request`.
-  - **1. Home Feed:** [mobile/app/(tabs)/index.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/index.tsx) with category carousel, urgency filters, and live request cards.
-  - **2. Discover Radar:** [mobile/app/(tabs)/discover.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/discover.tsx) with search, radius chips (1, 3, 5, 10, 20 km), and list/map view switcher.
-  - **3. Create Request Wizard:** [mobile/app/(tabs)/create.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/create.tsx) with 5-step form (category, details, priority, radius, budget/negotiable).
-  - **4. Activity Dashboard:** [mobile/app/(tabs)/activity.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/activity.tsx) (Ongoing, My Requests, My Offers, Completed).
-  - **5. User Profile & Trust:** [mobile/app/(tabs)/profile.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/profile.tsx) (Reputation, verification badges, skills, services offered, theme toggle, DPDP settings).
+  - Direct root landing into [mobile/app/(tabs)/index.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(tabs)/index.tsx) with zero developer friction.
+  - Custom bottom tab bar with prominent raised center action for `Create Request`.
+  - **1. Streamlined Home Feed:** Two big primary actions ("Ask for Help" & "Browse & Earn"), category filter chips, and high-readability request cards with clear price tags and single-tap "Help" button.
+  - **2. Discover Radar:** Search bar + 1km / 5km / 10km / 20km quick radius chips + active request list.
+  - **3. Simple Request Creator:** 3 quick steps: Category chip, "What do you need?", and budget presets (₹100, ₹250, ₹500, ₹1000) with 2-option urgency toggle (⚡ Urgent / 🕒 Flexible).
+  - **4. Activity Dashboard:** Segregated tabs for Ongoing, My Requests, My Offers, and Completed.
+  - **5. User Profile & Trust:** Reputation metrics, trust badges, skills, and instant Dark/Light theme toggle.
 - [x] **Authentication & Onboarding Shells:**
   - [mobile/app/(auth)/welcome.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/welcome.tsx): 3-slide value proposition carousel.
   - [mobile/app/(auth)/login.tsx](file:///c:/Users/Home/Desktop/wavy/mobile/app/(auth)/login.tsx): Google one-tap & email/password authentication preview.
