@@ -1,229 +1,171 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   StyleSheet,
   Text,
   View,
-  ScrollView,
   TouchableOpacity,
-  RefreshControl,
+  Animated,
+  Easing,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme/ThemeContext';
-import { RequestCard } from '../../src/components/RequestCard';
-import { Skeleton } from '../../src/components/ui/Skeleton';
-import { EmptyState } from '../../src/components/ui/EmptyState';
-import {
-  fetchCategories,
-  fetchFeed,
-  Category,
-  CommunityRequest,
-} from '../../src/services/requestsApi';
-import {
-  Search,
-  Plus,
-  HelpCircle,
-  MapPin,
-  SlidersHorizontal,
-} from 'lucide-react-native';
+import { MapPin, Sparkles, Compass } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
-  const { colors, spacing, typography, radius } = useTheme();
+  const { colors, typography } = useTheme();
   const router = useRouter();
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [requests, setRequests] = useState<CommunityRequest[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  // Three concentric animated radar rings
+  const ring1 = useRef(new Animated.Value(0)).current;
+  const ring2 = useRef(new Animated.Value(0)).current;
+  const ring3 = useRef(new Animated.Value(0)).current;
 
-  const loadData = async () => {
-    try {
-      const [cats, feedData] = await Promise.all([
-        fetchCategories().catch(() => []),
-        fetchFeed({
-          category: selectedCategory !== 'all' ? selectedCategory : undefined,
-        }).catch(() => ({ requests: [] })),
-      ]);
-      setCategories(cats);
-      setRequests(feedData.requests || []);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
+  // Center button gentle breathing pulse
+  const buttonPulse = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
-    setLoading(true);
-    loadData();
-  }, [selectedCategory]);
+    const createRingAnimation = (anim: Animated.Value, delay: number) => {
+      return Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: 2600,
+            easing: Easing.out(Easing.ease),
+            useNativeDriver: true,
+          }),
+        ])
+      );
+    };
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadData();
+    const pulseAnim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(buttonPulse, {
+          toValue: 1.05,
+          duration: 1300,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+        Animated.timing(buttonPulse, {
+          toValue: 1,
+          duration: 1300,
+          easing: Easing.inOut(Easing.ease),
+          useNativeDriver: true,
+        }),
+      ])
+    );
+
+    const anim1 = createRingAnimation(ring1, 0);
+    const anim2 = createRingAnimation(ring2, 800);
+    const anim3 = createRingAnimation(ring3, 1600);
+
+    anim1.start();
+    anim2.start();
+    anim3.start();
+    pulseAnim.start();
+
+    return () => {
+      anim1.stop();
+      anim2.stop();
+      anim3.stop();
+      pulseAnim.stop();
+    };
+  }, []);
+
+  const renderRadarRing = (anim: Animated.Value) => {
+    const scale = anim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [1, 2.5],
+    });
+
+    const opacity = anim.interpolate({
+      inputRange: [0, 0.4, 1],
+      outputRange: [0.4, 0.2, 0],
+    });
+
+    return (
+      <Animated.View
+        style={[
+          styles.radarRing,
+          {
+            borderColor: colors.googleBlue,
+            backgroundColor: colors.primaryContainer,
+            transform: [{ scale }],
+            opacity,
+          },
+        ]}
+      />
+    );
   };
 
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* 1. Google Signature Search Bar */}
-      <View style={styles.topContainer}>
-        <TouchableOpacity
-          activeOpacity={0.9}
-          onPress={() => router.push('/(tabs)/discover' as any)}
-          style={[
-            styles.googleSearchPill,
-            {
-              backgroundColor: colors.surface,
-              borderColor: colors.border,
-            },
-          ]}
-        >
-          {/* Iconic Google 4-Color Quartet Indicator */}
-          <View style={styles.googleDots}>
-            <View style={[styles.gDot, { backgroundColor: colors.googleBlue }]} />
-            <View style={[styles.gDot, { backgroundColor: colors.googleRed }]} />
-            <View style={[styles.gDot, { backgroundColor: colors.googleYellow }]} />
-            <View style={[styles.gDot, { backgroundColor: colors.googleGreen }]} />
-          </View>
-
-          <Text style={[typography.body, { color: colors.textSecondary, marginLeft: 10, flex: 1 }]}>
-            Search requests in Hyderabad...
-          </Text>
-
-          {/* Profile Circle Avatar */}
-          <TouchableOpacity
-            onPress={() => router.push('/(tabs)/profile' as any)}
-            style={[styles.profileAvatar, { backgroundColor: colors.primary }]}
-          >
-            <Text style={{ color: '#FFFFFF', fontWeight: '700', fontSize: 13 }}>R</Text>
-          </TouchableOpacity>
-        </TouchableOpacity>
-
-        {/* 2. Google Material Filter Chips */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.chipsScroll}
-        >
-          <TouchableOpacity
-            onPress={() => setSelectedCategory('all')}
-            style={[
-              styles.filterChip,
-              {
-                backgroundColor: selectedCategory === 'all' ? colors.primaryContainer : colors.surface,
-                borderColor: selectedCategory === 'all' ? colors.primary : colors.border,
-              },
-            ]}
-          >
-            <Text
-              style={[
-                typography.caption,
-                {
-                  color: selectedCategory === 'all' ? colors.primary : colors.textSecondary,
-                  fontWeight: selectedCategory === 'all' ? '700' : '500',
-                },
-              ]}
-            >
-              All
-            </Text>
-          </TouchableOpacity>
-
-          {categories.map((cat) => {
-            const isSelected = selectedCategory === cat.slug;
-            return (
-              <TouchableOpacity
-                key={cat.id}
-                onPress={() => setSelectedCategory(cat.slug)}
-                style={[
-                  styles.filterChip,
-                  {
-                    backgroundColor: isSelected ? colors.primaryContainer : colors.surface,
-                    borderColor: isSelected ? colors.primary : colors.border,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    typography.caption,
-                    {
-                      color: isSelected ? colors.primary : colors.textSecondary,
-                      fontWeight: isSelected ? '700' : '500',
-                    },
-                  ]}
-                >
-                  {cat.name}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </ScrollView>
-      </View>
-
-      {/* 3. Clean Google-Style Feed */}
-      <ScrollView
-        contentContainerStyle={[styles.feedContent, { paddingBottom: 110 }]}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={colors.primary}
-            colors={[colors.primary]}
-          />
-        }
-      >
-        <View style={styles.feedHeader}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <MapPin size={13} color={colors.primary} />
-            <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: 4, fontWeight: '600' }]}>
-              Gachibowli, Hyderabad
-            </Text>
-          </View>
-          <Text style={[typography.caption, { color: colors.textTertiary }]}>
-            {requests.length} active needs
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
+      {/* Top Locality Bar */}
+      <View style={styles.topBar}>
+        <View style={[styles.locationChip, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <MapPin size={14} color={colors.googleBlue} />
+          <Text style={[typography.caption, { color: colors.text, fontWeight: '600', marginLeft: 5 }]}>
+            Gachibowli, Hyderabad
           </Text>
         </View>
 
-        {loading ? (
-          <View style={{ gap: 12 }}>
-            <Skeleton height={140} borderRadius={16} />
-            <Skeleton height={140} borderRadius={16} />
-          </View>
-        ) : requests.length > 0 ? (
-          requests.map((item) => (
-            <RequestCard
-              key={item.id}
-              request={item}
-              onPress={() => router.push(`/requests/${item.id}` as any)}
-            />
-          ))
-        ) : (
-          <EmptyState
-            icon={<HelpCircle size={36} color={colors.primary} />}
-            title="No requests nearby"
-            description="Tap the '+ Ask Help' button to post what you need in seconds."
-            actionTitle="Ask for Help"
-            onAction={() => router.push('/(tabs)/create' as any)}
-          />
-        )}
-      </ScrollView>
+        <TouchableOpacity
+          onPress={() => router.push('/(tabs)/discover' as any)}
+          style={[styles.exploreBtn, { backgroundColor: colors.surface, borderColor: colors.border }]}
+          activeOpacity={0.8}
+        >
+          <Compass size={16} color={colors.textSecondary} />
+        </TouchableOpacity>
+      </View>
 
-      {/* 4. Google Material 3 Floating Action Button (FAB) in Google Blue */}
-      <TouchableOpacity
-        activeOpacity={0.88}
-        onPress={() => router.push('/(tabs)/create' as any)}
-        style={[
-          styles.fab,
-          {
-            backgroundColor: colors.primary,
-            shadowColor: colors.primary,
-          },
-        ]}
-      >
-        <Plus size={20} color="#FFFFFF" strokeWidth={2.8} />
-        <Text style={[typography.bodyBold, { color: '#FFFFFF', marginLeft: 6 }]}>
-          Ask Help
+      {/* Center Radar & Circular Button */}
+      <View style={styles.centerContainer}>
+        {/* Animated Radar Pulse Waves */}
+        {renderRadarRing(ring1)}
+        {renderRadarRing(ring2)}
+        {renderRadarRing(ring3)}
+
+        {/* The Central Circular "Ask for Help" Button */}
+        <Animated.View style={{ transform: [{ scale: buttonPulse }] }}>
+          <TouchableOpacity
+            activeOpacity={0.88}
+            onPress={() => router.push('/(tabs)/create' as any)}
+            style={[
+              styles.centerCircleButton,
+              {
+                backgroundColor: colors.googleBlue,
+                shadowColor: colors.googleBlue,
+              },
+            ]}
+          >
+            <Sparkles size={32} color="#FFFFFF" strokeWidth={2.4} />
+            <Text style={styles.buttonMainText}>Ask for Help</Text>
+            <Text style={styles.buttonSubText}>Tap to Connect</Text>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* Subtle Radar Status */}
+        <Text style={[typography.caption, { color: colors.textTertiary, marginTop: 42, letterSpacing: 0.5 }]}>
+          HYPERLOCAL RADAR ACTIVE
         </Text>
-      </TouchableOpacity>
+        <Text style={[typography.body, { color: colors.textSecondary, marginTop: 4, textAlign: 'center', maxWidth: 260 }]}>
+          Connect with nearby helpers for printing, repairs, rides & tutoring
+        </Text>
+      </View>
+
+      {/* Bottom Quick Access to Browse Nearby */}
+      <View style={styles.bottomBar}>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => router.push('/(tabs)/discover' as any)}
+          style={[styles.browseButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+        >
+          <Text style={[typography.bodyBold, { color: colors.googleBlue }]}>
+            Browse Nearby Requests
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -232,72 +174,75 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
-  topContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 4,
-  },
-  googleSearchPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 52,
-    borderRadius: 26,
-    borderWidth: 1,
-    paddingHorizontal: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  googleDots: {
-    flexDirection: 'row',
-    gap: 3,
-  },
-  gDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  profileAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  chipsScroll: {
-    gap: 8,
-    paddingVertical: 10,
-  },
-  filterChip: {
-    paddingHorizontal: 14,
-    paddingVertical: 7,
-    borderRadius: 16,
-    borderWidth: 1,
-  },
-  feedContent: {
-    paddingHorizontal: 16,
-    paddingTop: 4,
-  },
-  feedHeader: {
+  topBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    paddingHorizontal: 20,
+    paddingTop: 12,
   },
-  fab: {
-    position: 'absolute',
-    bottom: 24,
-    right: 20,
+  locationChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
-    borderRadius: 28,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.35,
-    shadowRadius: 8,
-    elevation: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  exploreBtn: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  centerContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  radarRing: {
+    position: 'absolute',
+    width: 170,
+    height: 170,
+    borderRadius: 85,
+    borderWidth: 1.5,
+  },
+  centerCircleButton: {
+    width: 170,
+    height: 170,
+    borderRadius: 85,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 18,
+    elevation: 10,
+  },
+  buttonMainText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '800',
+    marginTop: 8,
+    letterSpacing: 0.3,
+  },
+  buttonSubText: {
+    color: 'rgba(255, 255, 255, 0.85)',
+    fontSize: 12,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  bottomBar: {
+    paddingHorizontal: 24,
+    paddingBottom: 24,
+    alignItems: 'center',
+  },
+  browseButton: {
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+    borderWidth: 1,
   },
 });
