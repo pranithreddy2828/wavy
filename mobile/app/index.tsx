@@ -8,10 +8,17 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from '../src/theme/colors';
+import { useTheme } from '../src/theme/ThemeContext';
 import { checkApiHealth, API_BASE_URL, HealthCheckResponse } from '../src/services/api';
+import { Button } from '../src/components/ui/Button';
+import { Badge } from '../src/components/ui/Badge';
+import { ArrowRight, Compass, ShieldCheck, Zap } from 'lucide-react-native';
+import { useRouter } from 'expo-router';
 
 export default function IndexScreen() {
+  const { colors, spacing, typography, radius } = useTheme();
+  const router = useRouter();
+
   const [loading, setLoading] = useState(false);
   const [healthData, setHealthData] = useState<HealthCheckResponse | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -36,101 +43,96 @@ export default function IndexScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea} edges={['bottom']}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       <ScrollView contentContainerStyle={styles.container}>
         {/* Brand Header */}
         <View style={styles.brandContainer}>
-          <View style={styles.badge}>
-            <Text style={styles.badgeText}>MILESTONE 1 VERIFIED</Text>
+          <View style={[styles.badge, { backgroundColor: colors.primaryMuted, borderColor: colors.primary }]}>
+            <Text style={[styles.badgeText, { color: colors.primary }]}>MILESTONE 2 — UI/UX SYSTEM</Text>
           </View>
-          <Text style={styles.title}>WAVY</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[typography.h1, { color: colors.text, letterSpacing: 2, fontSize: 38 }]}>
+            WAVY
+          </Text>
+          <Text style={[typography.body, { color: colors.textSecondary, textAlign: 'center', marginTop: 4, maxWidth: 300 }]}>
             Hyperlocal Community Assistance & Opportunity Platform
           </Text>
-          <Text style={styles.market}>📍 Hyderabad, India</Text>
+          <Text style={[typography.caption, { color: colors.primary, fontWeight: '700', marginTop: 6 }]}>
+            📍 Initial Market: Hyderabad, India
+          </Text>
         </View>
 
-        {/* System & Architecture Card */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>System Architecture Status</Text>
-          <View style={styles.row}>
-            <Text style={styles.label}>Frontend:</Text>
-            <Text style={styles.value}>React Native + Expo SDK 52 (TS)</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Backend Core:</Text>
-            <Text style={styles.value}>Python Flask REST + Socket.IO</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Database:</Text>
-            <Text style={styles.value}>MySQL 8+ (23 Tables Normalized)</Text>
-          </View>
-          <View style={styles.row}>
-            <Text style={styles.label}>Target Endpoint:</Text>
-            <Text style={[styles.value, styles.codeText]}>{API_BASE_URL}</Text>
-          </View>
-        </View>
-
-        {/* API Diagnostic Connectivity Test */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Backend Ping & Health Diagnostic</Text>
-          <Text style={styles.cardDescription}>
-            Test live end-to-end HTTP connectivity between the mobile client and Flask backend.
+        {/* Primary Launch Action */}
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.primary }]}>
+          <Badge label="2026 FLAGSHIP INTERFACE" variant="primary" size="sm" />
+          <Text style={[typography.h3, { color: colors.text, marginTop: spacing.xs }]}>
+            Launch WAVY Application
+          </Text>
+          <Text style={[typography.body, { color: colors.textSecondary, marginBottom: spacing.md }]}>
+            Explore the 5-section tab navigation, categorized request feed, discovery radar, request creation wizard, and reputation profile.
           </Text>
 
-          <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
+          <Button
+            title="Open WAVY Tabs App"
+            variant="primary"
+            size="lg"
+            fullWidth
+            onPress={() => router.push('/(tabs)' as any)}
+            icon={<ArrowRight size={18} color={colors.textInverse} />}
+            iconPosition="right"
+          />
+
+          <Button
+            title="View Welcome & Onboarding"
+            variant="secondary"
+            size="md"
+            fullWidth
+            onPress={() => router.push('/(auth)/welcome' as any)}
+            style={{ marginTop: spacing.sm }}
+          />
+        </View>
+
+        {/* Live Diagnostics Card */}
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={[typography.h4, { color: colors.text }]}>API Diagnostics & Health</Text>
+          <Text style={[typography.caption, { color: colors.textSecondary, marginBottom: spacing.xs }]}>
+            Target: <Text style={{ color: colors.primary }}>{API_BASE_URL}</Text>
+          </Text>
+
+          <Button
+            title="Ping Backend API (/health)"
+            variant="outline"
+            size="md"
+            loading={loading}
             onPress={testBackendConnection}
-            disabled={loading}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <ActivityIndicator color={colors.textInverse} size="small" />
-            ) : (
-              <Text style={styles.buttonText}>Ping Backend API (/health)</Text>
-            )}
-          </TouchableOpacity>
+          />
 
           {pingDuration !== null && (
-            <Text style={styles.pingText}>Roundtrip Latency: {pingDuration} ms</Text>
+            <Text style={[typography.tiny, { color: colors.textTertiary, textAlign: 'center', marginTop: 6 }]}>
+              Roundtrip: {pingDuration} ms
+            </Text>
           )}
 
           {healthData && (
-            <View style={styles.successBox}>
-              <Text style={styles.successTitle}>✓ Connected to WAVY Backend</Text>
-              <Text style={styles.resultText}>• Service: {healthData.service}</Text>
-              <Text style={styles.resultText}>• Version: {healthData.version}</Text>
-              <Text style={styles.resultText}>• City Target: {healthData.city}</Text>
-              <Text style={styles.resultText}>
-                • Database Ping: {healthData.database.status}
+            <View style={[styles.statusBox, { backgroundColor: colors.successMuted, borderColor: colors.success }]}>
+              <Text style={[typography.caption, { color: colors.success, fontWeight: '700' }]}>
+                ✓ Connected to {healthData.service} (v{healthData.version})
               </Text>
-              {healthData.database.error && (
-                <Text style={styles.warningText}>
-                  Note: {healthData.database.error}
-                </Text>
-              )}
+              <Text style={[typography.tiny, { color: colors.text, marginTop: 2 }]}>
+                Database: {healthData.database.status} • City Target: {healthData.city}
+              </Text>
             </View>
           )}
 
           {errorMsg && (
-            <View style={styles.errorBox}>
-              <Text style={styles.errorTitle}>Connection Failed</Text>
-              <Text style={styles.errorText}>{errorMsg}</Text>
-              <Text style={styles.tipText}>
-                Tip: If testing on a physical phone, ensure your mobile device and PC are on the same Wi-Fi and use your PC's LAN IP in mobile/.env.
+            <View style={[styles.statusBox, { backgroundColor: colors.dangerMuted, borderColor: colors.danger }]}>
+              <Text style={[typography.caption, { color: colors.danger, fontWeight: '700' }]}>
+                Diagnostic Notice
+              </Text>
+              <Text style={[typography.tiny, { color: colors.text, marginTop: 2 }]}>
+                {errorMsg}
               </Text>
             </View>
           )}
-        </View>
-
-        {/* Foundation Milestones Checklist */}
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Milestone 1 Checklist</Text>
-          <Text style={styles.checkItem}>✓ Modular Multi-Tier Architecture</Text>
-          <Text style={styles.checkItem}>✓ Relational Schema with 23 Tables & Category Seeds</Text>
-          <Text style={styles.checkItem}>✓ Python Flask Application Factory & Blueprints</Text>
-          <Text style={styles.checkItem}>✓ React Native Expo Shell & Navigation Foundation</Text>
-          <Text style={styles.checkItem}>✓ Pytest Unit & Integration Health Suite</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -140,7 +142,6 @@ export default function IndexScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: colors.background,
   },
   container: {
     padding: 20,
@@ -148,156 +149,29 @@ const styles = StyleSheet.create({
   },
   brandContainer: {
     alignItems: 'center',
-    marginVertical: 12,
+    marginVertical: 10,
   },
   badge: {
-    backgroundColor: colors.primaryMuted,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: colors.primary,
     marginBottom: 8,
   },
   badgeText: {
-    color: colors.primary,
     fontSize: 11,
     fontWeight: '800',
     letterSpacing: 1,
   },
-  title: {
-    color: colors.text,
-    fontSize: 34,
-    fontWeight: '900',
-    letterSpacing: 2,
-  },
-  subtitle: {
-    color: colors.textSecondary,
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 4,
-    maxWidth: 280,
-  },
-  market: {
-    color: colors.primary,
-    fontSize: 12,
-    fontWeight: '600',
-    marginTop: 6,
-  },
   card: {
-    backgroundColor: colors.surface,
     borderRadius: 16,
     padding: 18,
     borderWidth: 1,
-    borderColor: colors.border,
-    gap: 8,
   },
-  cardTitle: {
-    color: colors.text,
-    fontSize: 16,
-    fontWeight: '700',
-    marginBottom: 4,
-  },
-  cardDescription: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    lineHeight: 18,
-    marginBottom: 8,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 4,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.surfaceSubtle,
-  },
-  label: {
-    color: colors.textTertiary,
-    fontSize: 13,
-  },
-  value: {
-    color: colors.text,
-    fontSize: 13,
-    fontWeight: '600',
-  },
-  codeText: {
-    color: colors.primary,
-    fontSize: 11,
-  },
-  button: {
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: colors.textInverse,
-    fontSize: 15,
-    fontWeight: '700',
-  },
-  pingText: {
-    color: colors.textTertiary,
-    fontSize: 12,
-    textAlign: 'center',
-    marginTop: 4,
-  },
-  successBox: {
-    backgroundColor: colors.successMuted,
-    borderColor: colors.success,
+  statusBox: {
+    padding: 10,
+    borderRadius: 8,
     borderWidth: 1,
-    borderRadius: 10,
-    padding: 12,
     marginTop: 10,
-    gap: 4,
-  },
-  successTitle: {
-    color: colors.success,
-    fontWeight: '700',
-    fontSize: 14,
-    marginBottom: 2,
-  },
-  resultText: {
-    color: colors.text,
-    fontSize: 12,
-  },
-  warningText: {
-    color: colors.warning,
-    fontSize: 11,
-    marginTop: 4,
-  },
-  errorBox: {
-    backgroundColor: colors.dangerMuted,
-    borderColor: colors.danger,
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 12,
-    marginTop: 10,
-    gap: 4,
-  },
-  errorTitle: {
-    color: colors.danger,
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  errorText: {
-    color: colors.text,
-    fontSize: 12,
-  },
-  tipText: {
-    color: colors.textSecondary,
-    fontSize: 11,
-    marginTop: 4,
-    fontStyle: 'italic',
-  },
-  checkItem: {
-    color: colors.textSecondary,
-    fontSize: 13,
-    paddingVertical: 3,
   },
 });
-
