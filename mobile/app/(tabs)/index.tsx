@@ -19,12 +19,11 @@ import {
   CommunityRequest,
 } from '../../src/services/requestsApi';
 import {
+  Search,
   MapPin,
-  Bell,
-  PlusCircle,
-  Compass,
-  Sparkles,
+  Plus,
   HelpCircle,
+  User,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
@@ -66,30 +65,94 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* 1. Header */}
-      <View style={[styles.header, { borderBottomColor: colors.borderSubtle }]}>
-        <View>
-          <Text style={[typography.h3, { color: colors.primary, fontWeight: '900', letterSpacing: 1.5 }]}>
-            WAVY
+      {/* 1. Google-Style Top Search Pill */}
+      <View style={styles.topContainer}>
+        <TouchableOpacity
+          activeOpacity={0.85}
+          onPress={() => router.push('/(tabs)/discover' as any)}
+          style={[
+            styles.googleSearchPill,
+            {
+              backgroundColor: colors.searchBarBg,
+              borderColor: colors.border,
+            },
+          ]}
+        >
+          <Search size={18} color={colors.textTertiary} />
+          <Text style={[typography.body, { color: colors.textSecondary, marginLeft: 10, flex: 1 }]}>
+            Search requests in Gachibowli...
           </Text>
-          <TouchableOpacity style={styles.locationRow} activeOpacity={0.7}>
-            <MapPin size={12} color={colors.primary} />
-            <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: 3 }]}>
-              Gachibowli, Hyderabad
+          <TouchableOpacity
+            onPress={() => router.push('/(tabs)/profile' as any)}
+            style={[styles.profileAvatar, { backgroundColor: colors.primaryContainer }]}
+          >
+            <User size={16} color={colors.primary} />
+          </TouchableOpacity>
+        </TouchableOpacity>
+
+        {/* 2. Material Filter Chips */}
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipsScroll}
+        >
+          <TouchableOpacity
+            onPress={() => setSelectedCategory('all')}
+            style={[
+              styles.filterChip,
+              {
+                backgroundColor: selectedCategory === 'all' ? colors.primaryContainer : colors.surface,
+                borderColor: selectedCategory === 'all' ? colors.primary : colors.border,
+              },
+            ]}
+          >
+            <Text
+              style={[
+                typography.caption,
+                {
+                  color: selectedCategory === 'all' ? colors.primary : colors.textSecondary,
+                  fontWeight: selectedCategory === 'all' ? '700' : '500',
+                },
+              ]}
+            >
+              All
             </Text>
           </TouchableOpacity>
-        </View>
 
-        <TouchableOpacity
-          style={[styles.bellButton, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }]}
-          activeOpacity={0.7}
-        >
-          <Bell size={18} color={colors.text} />
-        </TouchableOpacity>
+          {categories.map((cat) => {
+            const isSelected = selectedCategory === cat.slug;
+            return (
+              <TouchableOpacity
+                key={cat.id}
+                onPress={() => setSelectedCategory(cat.slug)}
+                style={[
+                  styles.filterChip,
+                  {
+                    backgroundColor: isSelected ? colors.primaryContainer : colors.surface,
+                    borderColor: isSelected ? colors.primary : colors.border,
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    typography.caption,
+                    {
+                      color: isSelected ? colors.primary : colors.textSecondary,
+                      fontWeight: isSelected ? '700' : '500',
+                    },
+                  ]}
+                >
+                  {cat.name}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
       </View>
 
+      {/* 3. Clean Feed */}
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingBottom: 90 }]}
+        contentContainerStyle={[styles.feedContent, { paddingBottom: 110 }]}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -99,143 +162,16 @@ export default function HomeScreen() {
           />
         }
       >
-        {/* 2. Welcome Greeting */}
-        <View style={styles.greetingBox}>
-          <Text style={[typography.h2, { color: colors.text, fontWeight: '800' }]}>
-            Community Help Hub
-          </Text>
-          <Text style={[typography.body, { color: colors.textSecondary, marginTop: 2 }]}>
-            Connect with neighbours for printing, repairs, tutoring & everyday tasks.
-          </Text>
-        </View>
-
-        {/* 3. Two Big, Dead-Simple Action Cards */}
-        <View style={styles.actionGrid}>
-          <TouchableOpacity
-            activeOpacity={0.88}
-            onPress={() => router.push('/(tabs)/create' as any)}
-            style={[
-              styles.actionCard,
-              {
-                backgroundColor: colors.primaryMuted,
-                borderColor: colors.primary,
-                borderRadius: radius.xl,
-              },
-            ]}
-          >
-            <View style={[styles.actionIconBubble, { backgroundColor: colors.primary }]}>
-              <PlusCircle size={24} color={colors.textInverse} />
-            </View>
-            <Text style={[typography.h4, { color: colors.text, marginTop: spacing.sm, fontWeight: '700' }]}>
-              Ask for Help
-            </Text>
-            <Text style={[typography.caption, { color: colors.textSecondary, marginTop: 2 }]}>
-              Post what you need in seconds
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            activeOpacity={0.88}
-            onPress={() => router.push('/(tabs)/discover' as any)}
-            style={[
-              styles.actionCard,
-              {
-                backgroundColor: colors.secondaryMuted,
-                borderColor: colors.secondary,
-                borderRadius: radius.xl,
-              },
-            ]}
-          >
-            <View style={[styles.actionIconBubble, { backgroundColor: colors.secondary }]}>
-              <Compass size={24} color="#FFFFFF" />
-            </View>
-            <Text style={[typography.h4, { color: colors.text, marginTop: spacing.sm, fontWeight: '700' }]}>
-              Browse & Earn
-            </Text>
-            <Text style={[typography.caption, { color: colors.textSecondary, marginTop: 2 }]}>
-              Help neighbours nearby
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* 4. Category Filter Chips */}
-        <View style={styles.categorySection}>
-          <Text style={[typography.caption, { color: colors.textTertiary, fontWeight: '700', marginBottom: 8, textTransform: 'uppercase' }]}>
-            FILTER BY CATEGORY
-          </Text>
-
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
-            <TouchableOpacity
-              onPress={() => setSelectedCategory('all')}
-              style={[
-                styles.categoryChip,
-                {
-                  backgroundColor: selectedCategory === 'all' ? colors.primary : colors.surfaceRaised,
-                  borderColor: selectedCategory === 'all' ? colors.primary : colors.border,
-                  borderRadius: radius.full,
-                },
-              ]}
-            >
-              <Text
-                style={[
-                  typography.caption,
-                  {
-                    color: selectedCategory === 'all' ? colors.textInverse : colors.text,
-                    fontWeight: '700',
-                  },
-                ]}
-              >
-                All Needs
-              </Text>
-            </TouchableOpacity>
-
-            {categories.map((cat) => {
-              const isSelected = selectedCategory === cat.slug;
-              return (
-                <TouchableOpacity
-                  key={cat.id}
-                  onPress={() => setSelectedCategory(cat.slug)}
-                  style={[
-                    styles.categoryChip,
-                    {
-                      backgroundColor: isSelected ? colors.primary : colors.surfaceRaised,
-                      borderColor: isSelected ? colors.primary : colors.border,
-                      borderRadius: radius.full,
-                    },
-                  ]}
-                >
-                  <Text
-                    style={[
-                      typography.caption,
-                      {
-                        color: isSelected ? colors.textInverse : colors.text,
-                        fontWeight: isSelected ? '700' : '500',
-                      },
-                    ]}
-                  >
-                    {cat.name}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </ScrollView>
-        </View>
-
-        {/* 5. Request Feed Header */}
         <View style={styles.feedHeader}>
-          <Text style={[typography.h4, { color: colors.text, fontWeight: '700' }]}>
-            Nearby Requests ({requests.length})
-          </Text>
-          <Text style={[typography.caption, { color: colors.textTertiary }]}>
-            Hyderabad
+          <Text style={[typography.caption, { color: colors.textTertiary, fontWeight: '700', textTransform: 'uppercase' }]}>
+            Nearby in Hyderabad ({requests.length})
           </Text>
         </View>
 
-        {/* 6. Feed Cards */}
         {loading ? (
-          <View style={{ gap: spacing.md }}>
-            <Skeleton height={130} borderRadius={radius.xl} />
-            <Skeleton height={130} borderRadius={radius.xl} />
+          <View style={{ gap: 12 }}>
+            <Skeleton height={140} borderRadius={20} />
+            <Skeleton height={140} borderRadius={20} />
           </View>
         ) : requests.length > 0 ? (
           requests.map((item) => (
@@ -248,13 +184,25 @@ export default function HomeScreen() {
         ) : (
           <EmptyState
             icon={<HelpCircle size={36} color={colors.primary} />}
-            title="No requests found here"
-            description="Try selecting 'All Needs' or post your own request for nearby neighbours to see."
-            actionTitle="Post a Request"
+            title="No requests right now"
+            description="Tap the '+ Ask Help' button below to post what you need in seconds."
+            actionTitle="Ask for Help"
             onAction={() => router.push('/(tabs)/create' as any)}
           />
         )}
       </ScrollView>
+
+      {/* 4. Google Material 3 Floating Action Button (FAB) */}
+      <TouchableOpacity
+        activeOpacity={0.85}
+        onPress={() => router.push('/(tabs)/create' as any)}
+        style={[styles.fab, { backgroundColor: colors.primary }]}
+      >
+        <Plus size={20} color={colors.textInverse} strokeWidth={2.8} />
+        <Text style={[typography.bodyBold, { color: colors.textInverse, marginLeft: 6 }]}>
+          Ask Help
+        </Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -263,67 +211,61 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 18,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
+  topContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 8,
+    paddingBottom: 6,
   },
-  locationRow: {
+  googleSearchPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 2,
-  },
-  bellButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
+    height: 50,
+    borderRadius: 25,
     borderWidth: 1,
+    paddingHorizontal: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  profileAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  content: {
-    padding: 16,
-  },
-  greetingBox: {
-    marginVertical: 10,
-  },
-  actionGrid: {
-    flexDirection: 'row',
-    gap: 12,
-    marginVertical: 10,
-  },
-  actionCard: {
-    flex: 1,
-    padding: 16,
-    borderWidth: 1,
-  },
-  actionIconBubble: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  categorySection: {
-    marginTop: 14,
-    marginBottom: 10,
-  },
-  categoryScroll: {
+  chipsScroll: {
     gap: 8,
+    paddingVertical: 12,
   },
-  categoryChip: {
+  filterChip: {
     paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingVertical: 7,
+    borderRadius: 16,
     borderWidth: 1,
+  },
+  feedContent: {
+    paddingHorizontal: 16,
+    paddingTop: 4,
   },
   feedHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 16,
     marginBottom: 10,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderRadius: 28,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
 });

@@ -11,16 +11,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../../src/theme/ThemeContext';
 import { Input } from '../../src/components/ui/Input';
 import { Button } from '../../src/components/ui/Button';
-import { Card } from '../../src/components/ui/Card';
-import { Badge } from '../../src/components/ui/Badge';
 import { fetchCategories, Category } from '../../src/services/requestsApi';
 import {
-  Sparkles,
-  Zap,
-  Clock,
   CheckCircle2,
-  MapPin,
   IndianRupee,
+  MapPin,
+  Sparkles,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
@@ -32,13 +28,11 @@ export default function CreateRequestScreen() {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [urgency, setUrgency] = useState<'urgent' | 'medium'>('urgent');
-  const [budget, setBudget] = useState('');
-  const [isNegotiable, setIsNegotiable] = useState(true);
+  const [budget, setBudget] = useState('200');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const budgetPresets = ['100', '250', '500', '1000'];
+  const budgetOptions = ['100', '200', '500', '1000'];
 
   useEffect(() => {
     fetchCategories()
@@ -51,7 +45,7 @@ export default function CreateRequestScreen() {
 
   const handleSubmit = () => {
     if (!title.trim()) {
-      Alert.alert('Please enter a title', 'Tell your neighbours what you need help with.');
+      Alert.alert('What do you need?', 'Please enter a short title for your request.');
       return;
     }
 
@@ -59,13 +53,13 @@ export default function CreateRequestScreen() {
     setTimeout(() => {
       setLoading(false);
       setSubmitted(true);
-    }, 600);
+    }, 500);
   };
 
   const handleReset = () => {
     setTitle('');
     setDescription('');
-    setBudget('');
+    setBudget('200');
     setSubmitted(false);
   };
 
@@ -73,11 +67,11 @@ export default function CreateRequestScreen() {
     return (
       <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
         <View style={styles.successWrapper}>
-          <View style={[styles.successCircle, { backgroundColor: colors.successMuted, borderColor: colors.success }]}>
-            <CheckCircle2 size={48} color={colors.success} />
+          <View style={[styles.successCircle, { backgroundColor: colors.primaryContainer }]}>
+            <CheckCircle2 size={44} color={colors.primary} />
           </View>
           <Text style={[typography.h2, { color: colors.text, textAlign: 'center', marginTop: spacing.md }]}>
-            Request Posted!
+            Request Published
           </Text>
           <Text
             style={[
@@ -85,11 +79,11 @@ export default function CreateRequestScreen() {
               { color: colors.textSecondary, textAlign: 'center', marginTop: 6, maxWidth: 300 },
             ]}
           >
-            People nearby in Gachibowli have been notified. You will receive offers right here.
+            People nearby in Gachibowli will see your request and send offers.
           </Text>
 
           <Button
-            title="View Active Feed"
+            title="Back to Home Feed"
             variant="primary"
             size="lg"
             fullWidth
@@ -100,7 +94,7 @@ export default function CreateRequestScreen() {
             style={{ marginTop: 24, marginBottom: 12 }}
           />
           <Button
-            title="Create Another Request"
+            title="Ask for something else"
             variant="secondary"
             size="md"
             fullWidth
@@ -113,22 +107,22 @@ export default function CreateRequestScreen() {
 
   return (
     <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]} edges={['top']}>
-      {/* Header */}
+      {/* Google-Style Header */}
       <View style={[styles.header, { borderBottomColor: colors.borderSubtle }]}>
         <Text style={[typography.h3, { color: colors.text, fontWeight: '800' }]}>
           Ask for Help
         </Text>
         <Text style={[typography.caption, { color: colors.textSecondary }]}>
-          Share what you need with nearby neighbours
+          Post a request to neighbours in Hyderabad
         </Text>
       </View>
 
-      <ScrollView contentContainerStyle={[styles.form, { paddingBottom: 110 }]}>
-        {/* Step 1: Category Picker */}
-        <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '700', marginBottom: 8 }]}>
-          SELECT CATEGORY
+      <ScrollView contentContainerStyle={[styles.form, { paddingBottom: 100 }]}>
+        {/* Category Pills */}
+        <Text style={[typography.caption, { color: colors.textTertiary, fontWeight: '700', marginBottom: 8, textTransform: 'uppercase' }]}>
+          CATEGORY
         </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, paddingBottom: 14 }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
           {categories.map((cat) => {
             const isSelected = selectedCategory === cat.id;
             return (
@@ -138,9 +132,8 @@ export default function CreateRequestScreen() {
                 style={[
                   styles.categoryPill,
                   {
-                    backgroundColor: isSelected ? colors.primary : colors.surfaceRaised,
+                    backgroundColor: isSelected ? colors.primaryContainer : colors.surface,
                     borderColor: isSelected ? colors.primary : colors.border,
-                    borderRadius: radius.full,
                   },
                 ]}
               >
@@ -148,7 +141,7 @@ export default function CreateRequestScreen() {
                   style={[
                     typography.caption,
                     {
-                      color: isSelected ? colors.textInverse : colors.text,
+                      color: isSelected ? colors.primary : colors.textSecondary,
                       fontWeight: isSelected ? '700' : '500',
                     },
                   ]}
@@ -160,100 +153,50 @@ export default function CreateRequestScreen() {
           })}
         </ScrollView>
 
-        {/* Step 2: What do you need? */}
+        {/* Title Input */}
         <Input
           label="What do you need?"
           placeholder="e.g. 20 Pages Color Printout by 4 PM"
           value={title}
           onChangeText={setTitle}
-          containerStyle={{ marginBottom: spacing.md }}
+          containerStyle={{ marginTop: 14, marginBottom: 12 }}
         />
 
+        {/* Short Note */}
         <Input
-          label="Details or Instructions (Optional)"
-          placeholder="e.g. Need double sided 100gsm paper, will collect near DLF."
+          label="Details or specifications (Optional)"
+          placeholder="e.g. Double sided Xerox on 100gsm paper, will collect."
           value={description}
           onChangeText={setDescription}
           multiline
           numberOfLines={3}
           style={{ minHeight: 70 }}
-          containerStyle={{ marginBottom: spacing.md }}
+          containerStyle={{ marginBottom: 16 }}
         />
 
-        {/* Step 3: Priority Toggle (2 big simple buttons) */}
-        <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '700', marginBottom: 8 }]}>
-          HOW URGENT IS THIS?
+        {/* Budget Presets */}
+        <Text style={[typography.caption, { color: colors.textTertiary, fontWeight: '700', marginBottom: 8, textTransform: 'uppercase' }]}>
+          YOUR BUDGET (₹ INR)
         </Text>
-        <View style={styles.urgencyRow}>
-          <TouchableOpacity
-            onPress={() => setUrgency('urgent')}
-            style={[
-              styles.urgencyButton,
-              {
-                backgroundColor: urgency === 'urgent' ? colors.urgentMuted : colors.surfaceRaised,
-                borderColor: urgency === 'urgent' ? colors.urgent : colors.border,
-                borderRadius: radius.md,
-              },
-            ]}
-          >
-            <Zap size={18} color={urgency === 'urgent' ? colors.urgent : colors.textSecondary} />
-            <Text
-              style={[
-                typography.bodyBold,
-                { color: urgency === 'urgent' ? colors.urgent : colors.text, marginLeft: 6 },
-              ]}
-            >
-              Urgent (Today)
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setUrgency('medium')}
-            style={[
-              styles.urgencyButton,
-              {
-                backgroundColor: urgency === 'medium' ? colors.primaryMuted : colors.surfaceRaised,
-                borderColor: urgency === 'medium' ? colors.primary : colors.border,
-                borderRadius: radius.md,
-              },
-            ]}
-          >
-            <Clock size={18} color={urgency === 'medium' ? colors.primary : colors.textSecondary} />
-            <Text
-              style={[
-                typography.bodyBold,
-                { color: urgency === 'medium' ? colors.primary : colors.text, marginLeft: 6 },
-              ]}
-            >
-              Flexible Time
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Step 4: Budget Quick Presets */}
-        <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '700', marginTop: spacing.md, marginBottom: 8 }]}>
-          OFFERED BUDGET (₹ INR)
-        </Text>
-        <View style={styles.presetRow}>
-          {budgetPresets.map((amt) => {
+        <View style={styles.budgetRow}>
+          {budgetOptions.map((amt) => {
             const isSelected = budget === amt;
             return (
               <TouchableOpacity
                 key={amt}
                 onPress={() => setBudget(amt)}
                 style={[
-                  styles.presetChip,
+                  styles.budgetChip,
                   {
-                    backgroundColor: isSelected ? colors.primary : colors.surfaceRaised,
+                    backgroundColor: isSelected ? colors.primaryContainer : colors.surface,
                     borderColor: isSelected ? colors.primary : colors.border,
-                    borderRadius: radius.md,
                   },
                 ]}
               >
                 <Text
                   style={[
                     typography.bodyBold,
-                    { color: isSelected ? colors.textInverse : colors.text },
+                    { color: isSelected ? colors.primary : colors.text },
                   ]}
                 >
                   ₹{amt}
@@ -264,55 +207,31 @@ export default function CreateRequestScreen() {
         </View>
 
         <Input
-          placeholder="Or enter custom budget (e.g. 350)"
+          placeholder="Or custom amount"
           value={budget}
           onChangeText={setBudget}
           keyboardType="numeric"
           leftIcon={<IndianRupee size={16} color={colors.textTertiary} />}
-          containerStyle={{ marginTop: 8, marginBottom: spacing.md }}
+          containerStyle={{ marginTop: 8, marginBottom: 14 }}
         />
 
-        {/* Negotiable Toggle */}
-        <TouchableOpacity
-          onPress={() => setIsNegotiable(!isNegotiable)}
-          style={[styles.negotiableBox, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }]}
-        >
-          <View style={{ flex: 1 }}>
-            <Text style={[typography.bodyBold, { color: colors.text }]}>Open to price negotiation</Text>
-            <Text style={[typography.caption, { color: colors.textSecondary }]}>
-              Allow helpers to propose alternate prices
-            </Text>
-          </View>
-          <View
-            style={[
-              styles.checkCircle,
-              {
-                backgroundColor: isNegotiable ? colors.primary : 'transparent',
-                borderColor: isNegotiable ? colors.primary : colors.border,
-              },
-            ]}
-          >
-            {isNegotiable && <Text style={{ color: '#000', fontSize: 12, fontWeight: '900' }}>✓</Text>}
-          </View>
-        </TouchableOpacity>
-
-        {/* Locality Note */}
-        <View style={styles.localityNote}>
-          <MapPin size={13} color={colors.primary} />
-          <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: 4 }]}>
-            Location: <Text style={{ color: colors.text, fontWeight: '600' }}>Gachibowli, Hyderabad (5 km radius)</Text>
+        {/* Location pill */}
+        <View style={[styles.locationBox, { backgroundColor: colors.surfaceVariant }]}>
+          <MapPin size={14} color={colors.primary} />
+          <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: 6 }]}>
+            Location: <Text style={{ color: colors.text, fontWeight: '600' }}>Gachibowli, Hyderabad (5 km)</Text>
           </Text>
         </View>
 
-        {/* Big Submit Button */}
+        {/* Submit */}
         <Button
-          title="Post Request to Neighbours"
+          title="Post Request"
           variant="primary"
           size="lg"
           fullWidth
           loading={loading}
           onPress={handleSubmit}
-          style={{ marginTop: spacing.lg }}
+          style={{ marginTop: 24 }}
         />
       </ScrollView>
     </SafeAreaView>
@@ -324,61 +243,39 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 18,
-    paddingVertical: 12,
+    paddingHorizontal: 20,
+    paddingVertical: 14,
     borderBottomWidth: 1,
   },
   form: {
-    padding: 16,
+    padding: 20,
+  },
+  categoryScroll: {
+    gap: 8,
   },
   categoryPill: {
     paddingHorizontal: 14,
     paddingVertical: 8,
+    borderRadius: 16,
     borderWidth: 1,
   },
-  urgencyRow: {
-    flexDirection: 'row',
-    gap: 10,
-  },
-  urgencyButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderWidth: 1,
-  },
-  presetRow: {
+  budgetRow: {
     flexDirection: 'row',
     gap: 8,
   },
-  presetChip: {
+  budgetChip: {
     flex: 1,
     paddingVertical: 10,
     alignItems: 'center',
     justifyContent: 'center',
+    borderRadius: 12,
     borderWidth: 1,
   },
-  negotiableBox: {
+  locationBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
     padding: 12,
-    borderRadius: 10,
-    borderWidth: 1,
-  },
-  checkCircle: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  localityNote: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
+    borderRadius: 12,
   },
   successWrapper: {
     flex: 1,
@@ -387,10 +284,9 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   successCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    borderWidth: 2,
+    width: 76,
+    height: 76,
+    borderRadius: 38,
     alignItems: 'center',
     justifyContent: 'center',
   },

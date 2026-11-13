@@ -1,14 +1,16 @@
 /**
- * WAVY Design System - Colors (Light & Dark Themes)
- * 2026 Hyperlocal Aesthetic: Obsidian/Teal Dark, Crisp Canvas Light
+ * WAVY Design System - Google Material 3 Aesthetic
+ * Ultra-clean, calm, accessible, and distraction-free
  */
 
 export interface ColorTheme {
   isDark: boolean;
   background: string;
   surface: string;
+  surfaceVariant: string;
   surfaceRaised: string;
   surfaceSubtle: string;
+  surfaceContainer: string;
   border: string;
   borderSubtle: string;
 
@@ -16,16 +18,21 @@ export interface ColorTheme {
   primary: string;
   primaryHover: string;
   primaryMuted: string;
+  primaryContainer: string;
+  onPrimaryContainer: string;
+
   secondary: string;
   secondaryMuted: string;
+  secondaryContainer: string;
 
-  // Status & Urgency
+  // Status Tones
   success: string;
   successMuted: string;
   warning: string;
   warningMuted: string;
   danger: string;
   dangerMuted: string;
+  error: string;
   urgent: string;
   urgentMuted: string;
 
@@ -35,81 +42,98 @@ export interface ColorTheme {
   textTertiary: string;
   textInverse: string;
 
-  // Navigation & Interactive
+  // Tab & Search
+  searchBarBg: string;
   tabBarBackground: string;
   tabBarBorder: string;
+  activePillBg: string;
   cardHighlight: string;
 }
 
 export const darkTheme: ColorTheme = {
   isDark: true,
-  background: '#090D16',
-  surface: '#111726',
-  surfaceRaised: '#182136',
-  surfaceSubtle: '#1F2B44',
-  border: '#243250',
-  borderSubtle: '#1A243A',
+  background: '#121316',
+  surface: '#1E1F24',
+  surfaceVariant: '#282A30',
+  surfaceRaised: '#23252B',
+  surfaceSubtle: '#2D3037',
+  surfaceContainer: '#23252B',
+  border: '#33363F',
+  borderSubtle: '#26282E',
 
   primary: '#00D1B2',
   primaryHover: '#00BFA5',
   primaryMuted: 'rgba(0, 209, 178, 0.14)',
+  primaryContainer: 'rgba(0, 209, 178, 0.14)',
+  onPrimaryContainer: '#00D1B2',
 
-  secondary: '#6366F1',
-  secondaryMuted: 'rgba(99, 102, 241, 0.14)',
+  secondary: '#8AB4F8',
+  secondaryMuted: 'rgba(138, 180, 248, 0.14)',
+  secondaryContainer: 'rgba(138, 180, 248, 0.14)',
 
-  success: '#10B981',
-  successMuted: 'rgba(16, 185, 129, 0.16)',
-  warning: '#F59E0B',
-  warningMuted: 'rgba(245, 158, 11, 0.16)',
-  danger: '#EF4444',
-  dangerMuted: 'rgba(239, 68, 68, 0.16)',
-  urgent: '#FF3366',
-  urgentMuted: 'rgba(255, 51, 102, 0.18)',
+  success: '#81C995',
+  successMuted: 'rgba(129, 201, 149, 0.16)',
+  warning: '#FDD663',
+  warningMuted: 'rgba(253, 214, 99, 0.16)',
+  danger: '#F28B82',
+  dangerMuted: 'rgba(242, 139, 130, 0.16)',
+  error: '#F28B82',
+  urgent: '#FF5252',
+  urgentMuted: 'rgba(255, 82, 82, 0.16)',
 
-  text: '#F8FAFC',
-  textSecondary: '#94A3B8',
-  textTertiary: '#64748B',
-  textInverse: '#090D16',
+  text: '#E3E3E3',
+  textSecondary: '#C4C7C5',
+  textTertiary: '#8E918F',
+  textInverse: '#121316',
 
-  tabBarBackground: '#0B101D',
-  tabBarBorder: '#1E293B',
-  cardHighlight: 'rgba(255, 255, 255, 0.03)',
+  searchBarBg: '#1E1F24',
+  tabBarBackground: '#18191D',
+  tabBarBorder: '#282A30',
+  activePillBg: 'rgba(0, 209, 178, 0.16)',
+  cardHighlight: 'rgba(255, 255, 255, 0.04)',
 };
 
 export const lightTheme: ColorTheme = {
   isDark: false,
-  background: '#F8FAFC',
+  background: '#F8F9FA',
   surface: '#FFFFFF',
-  surfaceRaised: '#F1F5F9',
-  surfaceSubtle: '#E2E8F0',
-  border: '#CBD5E1',
-  borderSubtle: '#E2E8F0',
+  surfaceVariant: '#F1F3F4',
+  surfaceRaised: '#F1F3F4',
+  surfaceSubtle: '#E8EAED',
+  surfaceContainer: '#EDEDED',
+  border: '#E0E2E5',
+  borderSubtle: '#F1F3F4',
 
-  primary: '#009E87',
-  primaryHover: '#008370',
-  primaryMuted: 'rgba(0, 158, 135, 0.12)',
+  primary: '#00875A',
+  primaryHover: '#00704A',
+  primaryMuted: '#E6F4EA',
+  primaryContainer: '#E6F4EA',
+  onPrimaryContainer: '#137333',
 
-  secondary: '#4F46E5',
-  secondaryMuted: 'rgba(79, 70, 229, 0.12)',
+  secondary: '#1A73E8',
+  secondaryMuted: '#E8F0FE',
+  secondaryContainer: '#E8F0FE',
 
-  success: '#059669',
-  successMuted: 'rgba(5, 150, 105, 0.14)',
-  warning: '#D97706',
-  warningMuted: 'rgba(217, 119, 6, 0.14)',
-  danger: '#DC2626',
-  dangerMuted: 'rgba(220, 38, 38, 0.14)',
-  urgent: '#E11D48',
-  urgentMuted: 'rgba(225, 29, 72, 0.14)',
+  success: '#188038',
+  successMuted: 'rgba(24, 128, 56, 0.14)',
+  warning: '#F29900',
+  warningMuted: 'rgba(242, 153, 0, 0.14)',
+  danger: '#D93025',
+  dangerMuted: 'rgba(217, 48, 37, 0.14)',
+  error: '#D93025',
+  urgent: '#D93025',
+  urgentMuted: 'rgba(217, 48, 37, 0.14)',
 
-  text: '#0F172A',
-  textSecondary: '#475569',
-  textTertiary: '#94A3B8',
+  text: '#1F1F1F',
+  textSecondary: '#444746',
+  textTertiary: '#747775',
   textInverse: '#FFFFFF',
 
+  searchBarBg: '#FFFFFF',
   tabBarBackground: '#FFFFFF',
-  tabBarBorder: '#E2E8F0',
+  tabBarBorder: '#E0E2E5',
+  activePillBg: '#E6F4EA',
   cardHighlight: 'rgba(0, 0, 0, 0.02)',
 };
 
-// Default export is darkTheme for WAVY's flagship aesthetic
 export const colors = darkTheme;

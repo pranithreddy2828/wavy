@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { CommunityRequest } from '../services/requestsApi';
-import { MapPin, Star, ArrowRight, Zap } from 'lucide-react-native';
+import { MapPin, Star, ArrowRight } from 'lucide-react-native';
 
 export interface RequestCardProps {
   request: CommunityRequest;
@@ -14,83 +14,66 @@ export const RequestCard: React.FC<RequestCardProps> = ({ request, onPress }) =>
 
   return (
     <TouchableOpacity
-      activeOpacity={0.88}
+      activeOpacity={0.85}
       onPress={onPress}
       style={[
         styles.card,
         {
           backgroundColor: colors.surface,
           borderColor: colors.border,
-          borderRadius: radius.xl,
+          borderRadius: 20,
         },
       ]}
     >
-      {/* Top Header: Category, Distance, and Urgency */}
+      {/* Top Meta: Category & Distance */}
       <View style={styles.topRow}>
-        <View style={styles.categoryBadge}>
-          <Text style={[typography.caption, { color: colors.primary, fontWeight: '700' }]}>
+        <View style={[styles.categoryPill, { backgroundColor: colors.surfaceVariant }]}>
+          <Text style={[typography.caption, { color: colors.textSecondary, fontWeight: '600' }]}>
             {request.category_name}
           </Text>
-          <View style={[styles.dot, { backgroundColor: colors.textTertiary }]} />
-          <MapPin size={13} color={colors.textSecondary} />
-          <Text style={[typography.caption, { color: colors.textSecondary, marginLeft: 2 }]}>
-            {request.distance_km} km
+        </View>
+
+        <View style={styles.distanceBadge}>
+          <MapPin size={12} color={colors.textTertiary} />
+          <Text style={[typography.caption, { color: colors.textTertiary, marginLeft: 3 }]}>
+            {request.distance_km} km away
           </Text>
         </View>
 
         {request.urgency === 'urgent' && (
-          <View style={[styles.urgentChip, { backgroundColor: colors.urgentMuted, borderColor: colors.urgent }]}>
-            <Zap size={11} color={colors.urgent} />
-            <Text style={[typography.tiny, { color: colors.urgent, fontWeight: '800', marginLeft: 2 }]}>
-              URGENT
-            </Text>
-          </View>
+          <View style={[styles.urgentDot, { backgroundColor: colors.error }]} />
         )}
       </View>
 
-      {/* Main Request Title */}
-      <Text style={[typography.h4, { color: colors.text, marginTop: spacing.xs, fontSize: 16 }]} numberOfLines={2}>
+      {/* Title */}
+      <Text style={[typography.h4, { color: colors.text, marginTop: spacing.sm, fontWeight: '700' }]} numberOfLines={2}>
         {request.title}
       </Text>
 
-      {/* Area & Details snippet */}
+      {/* Description Snippet */}
       <Text
-        style={[typography.body, { color: colors.textSecondary, marginTop: 4 }]}
+        style={[typography.body, { color: colors.textSecondary, marginTop: 4, lineHeight: 20 }]}
         numberOfLines={2}
       >
         {request.description}
       </Text>
 
-      {/* Bottom Bar: Price, Requester info, and Action */}
+      {/* Bottom Bar: Price & Action */}
       <View style={[styles.bottomBar, { borderTopColor: colors.borderSubtle }]}>
         <View>
-          <Text style={[typography.tiny, { color: colors.textTertiary, textTransform: 'uppercase' }]}>
-            {request.is_negotiable ? 'Budget (Negotiable)' : 'Fixed Budget'}
+          <Text style={[typography.tiny, { color: colors.textTertiary }]}>
+            {request.is_negotiable ? 'BUDGET (NEGOTIABLE)' : 'FIXED BUDGET'}
           </Text>
-          <Text style={[typography.h3, { color: colors.primary, fontWeight: '900', marginTop: 1 }]}>
+          <Text style={[typography.h3, { color: colors.text, fontWeight: '800', marginTop: 1 }]}>
             ₹{request.budget ? request.budget.toFixed(0) : 'Open'}
           </Text>
         </View>
 
-        <View style={styles.rightSide}>
-          <View style={styles.requesterBrief}>
-            <Text style={[typography.caption, { color: colors.text, fontWeight: '600' }]}>
-              {request.requester.display_name}
-            </Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Star size={11} color="#F59E0B" fill="#F59E0B" />
-              <Text style={[typography.tiny, { color: colors.textSecondary, marginLeft: 2 }]}>
-                {request.requester.rating_avg.toFixed(1)}
-              </Text>
-            </View>
-          </View>
-
-          <View style={[styles.actionButton, { backgroundColor: colors.primaryMuted, borderColor: colors.primary }]}>
-            <Text style={[typography.caption, { color: colors.primary, fontWeight: '700' }]}>
-              Help
-            </Text>
-            <ArrowRight size={13} color={colors.primary} style={{ marginLeft: 3 }} />
-          </View>
+        <View style={[styles.helpButton, { backgroundColor: colors.primaryContainer }]}>
+          <Text style={[typography.caption, { color: colors.primary, fontWeight: '700', marginRight: 4 }]}>
+            Offer Help
+          </Text>
+          <ArrowRight size={13} color={colors.primary} />
         </View>
       </View>
     </TouchableOpacity>
@@ -105,49 +88,37 @@ const styles = StyleSheet.create({
   },
   topRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    gap: 8,
   },
-  categoryBadge: {
+  categoryPill: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+  },
+  distanceBadge: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  dot: {
-    width: 3,
-    height: 3,
-    borderRadius: 2,
-    marginHorizontal: 6,
-  },
-  urgentChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 12,
-    borderWidth: 1,
+  urgentDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    marginLeft: 'auto',
   },
   bottomBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 12,
+    marginTop: 14,
     paddingTop: 10,
     borderTopWidth: 1,
   },
-  rightSide: {
+  helpButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-  },
-  requesterBrief: {
-    alignItems: 'flex-end',
-  },
-  actionButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    borderWidth: 1,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 18,
   },
 });
