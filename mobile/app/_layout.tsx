@@ -31,9 +31,6 @@ function RootNavigationShell() {
         {/* Main Tab Navigation is the primary root */}
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-        {/* Authentication Stack */}
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-
         {/* Dynamic Request Details */}
         <Stack.Screen
           name="requests/[id]"

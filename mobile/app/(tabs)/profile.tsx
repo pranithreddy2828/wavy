@@ -22,7 +22,6 @@ import {
   FileText,
   Lock,
   ChevronRight,
-  LogOut,
   MapPin,
 } from 'lucide-react-native';
 
@@ -165,12 +164,6 @@ export default function ProfileScreen() {
             </TouchableOpacity>
           ))}
         </Card>
-
-        {/* Logout / Switch Account */}
-        <TouchableOpacity style={styles.logoutButton} activeOpacity={0.7}>
-          <LogOut size={16} color={colors.danger} style={{ marginRight: 6 }} />
-          <Text style={[typography.bodyBold, { color: colors.danger }]}>Sign Out of WAVY</Text>
-        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
